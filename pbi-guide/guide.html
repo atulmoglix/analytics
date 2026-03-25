@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Power BI Guide — Moglix Analytics</title>
+<link rel="icon" href="../assets/moglix-favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --red:#D9232D;--red-dark:#b51c25;--red-glow:rgba(217,35,45,.15);
+  --navy:#0B1D3A;--navy-mid:#0f2347;--navy-light:#162e56;
+  --gold:#C9A227;--gold-light:#E8D48B;
+  --blue:#2563EB;--blue-light:#60A5FA;
+  --white:#ffffff;--text:#333333;
+  --sidebar-bg:#091628;--sidebar-border:rgba(255,255,255,.08);
+  --glass:rgba(255,255,255,.05);--border:rgba(255,255,255,.1);
+  --surface:rgba(255,255,255,.06);
+  --persona-color:var(--red);/* set by JS */
+}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:'Poppins',sans-serif;
+  background:var(--navy);color:var(--white);
+  display:flex;flex-direction:column;
+}
+
+/* ══ HEADER ══ */
+.top-bar{
+  display:flex;align-items:center;gap:0;
+  height:54px;min-height:54px;
+  background:var(--sidebar-bg);
+  border-bottom:1px solid var(--sidebar-border);
+  z-index:200;flex-shrink:0;
+}
+.top-logo{
+  display:flex;align-items:center;gap:10px;
+  width:260px;padding:0 20px;flex-shrink:0;
+  border-right:1px solid var(--sidebar-border);height:100%;
+}
+.top-logo svg{height:22px}
+.top-nav{display:flex;align-items:center;gap:6px;padding:0 20px;flex:1}
+.breadcrumb{display:flex;align-items:center;gap:8px;font-size:.78rem;color:rgba(255,255,255,.4)}
+.breadcrumb a{color:rgba(255,255,255,.4);text-decoration:none;transition:color .2s}
+.breadcrumb a:hover{color:rgba(255,255,255,.8)}
+.breadcrumb .sep{color:rgba(255,255,255,.2)}
+.breadcrumb .current{color:rgba(255,255,255,.8);font-weight:500}
+.persona-badge{
+  padding:4px 12px;border-radius:12px;font-size:.7rem;font-weight:600;
+  letter-spacing:.04em;text-transform:uppercase;
+  background:rgba(var(--persona-rgb),.15);
+  border:1px solid rgba(var(--persona-rgb),.35);
+  color:var(--persona-color);
+}
+.top-actions{display:flex;align-items:center;gap:8px;padding-right:16px}
+.btn-icon{
+  width:36px;height:36px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--glass);border:1px solid var(--border);
+  cursor:pointer;font-size:1rem;transition:all .2s;
+  color:rgba(255,255,255,.6);
+}
+.btn-icon:hover{background:rgba(255,255,255,.1);color:var(--white)}
+.btn-icon.active{
+  background:rgba(var(--persona-rgb),.15);
+  border-color:rgba(var(--persona-rgb),.4);
+  color:var(--persona-color);
+}
+.progress-bar-wrap{
+  height:2px;background:rgba(255,255,255,.06);flex:1;
+  margin:0 16px;border-radius:2px;
+}
+.progress-bar{height:100%;background:var(--persona-color);border-radius:2px;transition:width .4s ease}
+
+/* ══ LAYOUT ══ */
+.layout{display:flex;flex:1;overflow:hidden}
+
+/* ── Sidebar ── */
+.sidebar{
+  width:260px;min-width:260px;
+  background:var(--sidebar-bg);
+  border-right:1px solid var(--sidebar-border);
+  display:flex;flex-direction:column;overflow:hidden;
+  position:relative;
+}
+.sidebar::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--gold),var(--gold-light),var(--gold));
+}
+.sidebar-inner{flex:1;overflow-y:auto;padding:16px 12px}
+.sidebar-inner::-webkit-scrollbar{width:4px}
+.sidebar-inner::-webkit-scrollbar-track{background:transparent}
+.sidebar-inner::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+
+.section-group{margin-bottom:8px}
+.section-header{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:10px;cursor:pointer;
+  transition:background .2s;font-size:.8rem;font-weight:600;
+  color:rgba(255,255,255,.5);
+}
+.section-header:hover{background:var(--glass)}
+.section-header.active{color:var(--white)}
+.section-header .s-num{
+  width:24px;height:24px;border-radius:8px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.7rem;font-weight:700;
+  background:rgba(255,255,255,.08);color:rgba(255,255,255,.4);
+  transition:all .2s;
+}
+.section-header.done .s-num{background:rgba(var(--persona-rgb),.2);color:var(--persona-color)}
+.section-header.active .s-num{background:var(--persona-color);color:#fff}
+.section-header .s-title{flex:1;line-height:1.3}
+.section-steps{padding:0 4px 4px 36px;display:none}
+.section-steps.open{display:block}
+.step-dot{
+  display:flex;align-items:center;gap:8px;
+  padding:6px 8px;border-radius:8px;cursor:pointer;
+  font-size:.75rem;color:rgba(255,255,255,.35);transition:all .2s;
+}
+.step-dot:hover{color:rgba(255,255,255,.7);background:rgba(255,255,255,.04)}
+.step-dot.active{color:rgba(255,255,255,.9);background:rgba(var(--persona-rgb),.08)}
+.step-dot.done{color:rgba(var(--persona-rgb),.7)}
+.dot{
+  width:6px;height:6px;border-radius:50%;flex-shrink:0;
+  background:rgba(255,255,255,.2);transition:all .2s;
+}
+.step-dot.active .dot{background:var(--persona-color);box-shadow:0 0 6px var(--persona-color)}
+.step-dot.done .dot{background:rgba(var(--persona-rgb),.5)}
+
+.sidebar-footer{
+  padding:14px 16px;border-top:1px solid var(--sidebar-border);
+  font-size:.7rem;color:rgba(255,255,255,.2);text-align:center;
+}
+.ar-credit{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  font-size:.7rem;color:rgba(201,162,39,.4);
+  padding:8px 16px;
+}
+.ar-mono-sm{
+  font-family:Georgia,serif;font-size:.85rem;font-weight:700;
+  color:rgba(201,162,39,.5);
+}
+
+/* ── Main content ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.step-view{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:20px}
+.step-view::-webkit-scrollbar{width:4px}
+.step-view::-webkit-scrollbar-track{background:transparent}
+.step-view::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+
+.step-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.step-meta{flex:1}
+.step-section-label{
+  font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--persona-color);font-weight:600;margin-bottom:6px;
+}
+.step-title{font-size:1.3rem;font-weight:700;line-height:1.3;margin-bottom:4px}
+.step-counter{
+  font-size:.75rem;color:rgba(255,255,255,.35);
+}
+
+/* Screenshot viewer */
+.screenshot-wrap{
+  position:relative;background:#050d1a;border-radius:16px;
+  border:1px solid var(--border);overflow:hidden;
+  aspect-ratio:16/9;width:100%;flex-shrink:0;
+}
+.screenshot-img{
+  width:100%;height:100%;object-fit:contain;
+  display:block;
+}
+.screenshot-placeholder{
+  width:100%;height:100%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:rgba(255,255,255,.15);gap:12px;
+  background:repeating-linear-gradient(
+    45deg,transparent,transparent 20px,
+    rgba(255,255,255,.01) 20px,rgba(255,255,255,.01) 40px
+  );
+}
+.screenshot-placeholder .ph-icon{font-size:3rem;opacity:.3}
+.screenshot-placeholder .ph-text{font-size:.8rem;font-weight:500;text-align:center;max-width:300px;line-height:1.6}
+.screenshot-placeholder .ph-path{
+  font-size:.7rem;font-family:monospace;
+  background:rgba(255,255,255,.06);padding:6px 12px;border-radius:8px;
+  color:rgba(255,255,255,.35);border:1px solid var(--border);
+}
+
+/* Annotation overlays */
+.annotation-layer{position:absolute;inset:0;pointer-events:none}
+.annotation-highlight{
+  position:absolute;border-radius:4px;pointer-events:auto;
+  transition:all .2s;cursor:pointer;
+}
+.annotation-highlight:hover{
+  background:rgba(255,220,0,.12)!important;
+  outline:2px solid rgba(255,220,0,.6)!important;
+}
+.annotation-callout{
+  position:absolute;pointer-events:auto;cursor:pointer;
+}
+.callout-bubble{
+  width:26px;height:26px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.72rem;font-weight:700;color:#fff;
+  box-shadow:0 2px 8px rgba(0,0,0,.5);
+  border:2px solid rgba(255,255,255,.3);
+  transition:transform .2s;
+}
+.annotation-callout:hover .callout-bubble{transform:scale(1.2)}
+.annotation-tooltip{
+  position:absolute;left:34px;top:50%;transform:translateY(-50%);
+  background:rgba(5,13,26,.95);border:1px solid rgba(255,255,255,.15);
+  border-radius:10px;padding:10px 14px;min-width:180px;max-width:240px;
+  font-size:.75rem;line-height:1.5;color:rgba(255,255,255,.85);
+  box-shadow:0 8px 24px rgba(0,0,0,.4);
+  display:none;z-index:10;pointer-events:none;
+}
+.annotation-callout:hover .annotation-tooltip,
+.annotation-highlight:hover .annotation-tooltip{display:block}
+/* Flip tooltip if near right edge */
+.annotation-callout.flip .annotation-tooltip{left:auto;right:34px}
+
+/* Annotation toggle */
+.annotation-controls{
+  position:absolute;top:12px;right:12px;display:flex;gap:6px;
+  pointer-events:auto;z-index:20;
+}
+.ann-toggle{
+  padding:5px 12px;border-radius:8px;font-size:.7rem;font-weight:600;
+  background:rgba(5,13,26,.8);border:1px solid rgba(255,255,255,.2);
+  color:rgba(255,255,255,.7);cursor:pointer;backdrop-filter:blur(8px);
+  transition:all .2s;
+}
+.ann-toggle:hover{background:rgba(255,255,255,.1);color:#fff}
+.ann-toggle.on{background:rgba(var(--persona-rgb),.25);border-color:var(--persona-color);color:var(--persona-color)}
+
+/* Caption */
+.caption-box{
+  background:var(--glass);border:1px solid var(--border);
+  border-radius:14px;padding:20px 24px;
+}
+.caption-text{font-size:.9rem;line-height:1.75;color:rgba(255,255,255,.75);margin-bottom:0}
+.key-points{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+.key-point{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:10px 14px;border-radius:10px;
+  background:rgba(var(--persona-rgb),.06);
+  border-left:3px solid var(--persona-color);
+  font-size:.82rem;color:rgba(255,255,255,.7);line-height:1.5;
+}
+.key-point .kp-icon{flex-shrink:0;margin-top:1px}
+
+/* Bottom nav */
+.step-nav{
+  flex-shrink:0;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 24px;border-top:1px solid var(--border);
+  background:rgba(9,22,40,.6);backdrop-filter:blur(8px);
+}
+.nav-btn{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 20px;border-radius:10px;font-size:.82rem;font-weight:600;
+  cursor:pointer;transition:all .2s;border:1px solid var(--border);
+  background:var(--glass);color:rgba(255,255,255,.6);
+}
+.nav-btn:hover{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)}
+.nav-btn.primary{
+  background:rgba(var(--persona-rgb),.2);
+  border-color:rgba(var(--persona-rgb),.5);
+  color:var(--persona-color);
+}
+.nav-btn.primary:hover{background:rgba(var(--persona-rgb),.3)}
+.nav-btn:disabled{opacity:.3;cursor:not-allowed;pointer-events:none}
+.nav-center{font-size:.78rem;color:rgba(255,255,255,.35);text-align:center}
+.nav-center strong{color:rgba(255,255,255,.6)}
+.kbd{
+  display:inline-block;padding:2px 6px;border-radius:4px;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+  font-size:.65rem;margin:0 2px;
+}
+
+/* ══ CHATBOT PANEL ══ */
+.chat-panel{
+  width:360px;min-width:360px;
+  background:var(--sidebar-bg);
+  border-left:1px solid var(--sidebar-border);
+  display:flex;flex-direction:column;
+  transform:translateX(100%);transition:transform .3s ease;
+  position:relative;
+}
+.chat-panel.open{transform:translateX(0)}
+.chat-header{
+  padding:16px 20px;border-bottom:1px solid var(--sidebar-border);
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+}
+.chat-title{display:flex;align-items:center;gap:8px;font-size:.88rem;font-weight:600}
+.ai-dot{
+  width:8px;height:8px;border-radius:50%;background:#22c55e;
+  animation:blink 2s infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.chat-messages{
+  flex:1;overflow-y:auto;padding:16px;
+  display:flex;flex-direction:column;gap:12px;
+}
+.chat-messages::-webkit-scrollbar{width:3px}
+.chat-messages::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+.msg{max-width:88%;line-height:1.6;font-size:.8rem}
+.msg.ai{
+  align-self:flex-start;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:4px 14px 14px 14px;padding:10px 14px;
+  color:rgba(255,255,255,.8);
+}
+.msg.user{
+  align-self:flex-end;
+  background:rgba(var(--persona-rgb),.2);
+  border:1px solid rgba(var(--persona-rgb),.3);
+  border-radius:14px 14px 4px 14px;padding:10px 14px;
+  color:rgba(255,255,255,.9);
+}
+.msg.thinking{color:rgba(255,255,255,.4);font-style:italic}
+.chat-api-setup{
+  padding:12px 16px;border-top:1px solid var(--sidebar-border);
+  border-bottom:1px solid var(--sidebar-border);
+  background:rgba(201,162,39,.04);
+  flex-shrink:0;display:none;
+}
+.chat-api-setup.show{display:block}
+.api-label{font-size:.68rem;color:rgba(255,255,255,.4);margin-bottom:6px;letter-spacing:.04em}
+.api-row{display:flex;gap:6px}
+.api-input{
+  flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+  border-radius:8px;padding:7px 10px;font-size:.75rem;color:#fff;
+  font-family:monospace;outline:none;
+}
+.api-input:focus{border-color:rgba(201,162,39,.4)}
+.api-input::placeholder{color:rgba(255,255,255,.2)}
+.api-save{
+  padding:7px 14px;border-radius:8px;font-size:.75rem;font-weight:600;
+  background:rgba(201,162,39,.2);border:1px solid rgba(201,162,39,.4);
+  color:var(--gold);cursor:pointer;transition:all .2s;white-space:nowrap;
+}
+.api-save:hover{background:rgba(201,162,39,.3)}
+.chat-input-wrap{
+  padding:12px 16px;border-top:1px solid var(--sidebar-border);flex-shrink:0;
+}
+.chat-input-row{display:flex;gap:8px}
+.chat-input{
+  flex:1;background:rgba(255,255,255,.06);border:1px solid var(--border);
+  border-radius:10px;padding:10px 14px;font-size:.8rem;color:#fff;
+  font-family:'Poppins',sans-serif;outline:none;resize:none;
+  max-height:80px;min-height:40px;
+}
+.chat-input:focus{border-color:rgba(var(--persona-rgb),.4)}
+.chat-input::placeholder{color:rgba(255,255,255,.25)}
+.send-btn{
+  width:40px;height:40px;border-radius:10px;flex-shrink:0;align-self:flex-end;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--persona-color);cursor:pointer;
+  border:none;font-size:1rem;transition:all .2s;
+}
+.send-btn:hover{opacity:.85}
+.send-btn:disabled{opacity:.3;cursor:not-allowed}
+.chat-hint{font-size:.65rem;color:rgba(255,255,255,.2);margin-top:6px;line-height:1.4}
+
+/* Suggestion chips */
+.suggestions{padding:0 16px 8px;display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.sugg-label{font-size:.65rem;color:rgba(255,255,255,.25);letter-spacing:.04em;margin-bottom:2px}
+.chip{
+  padding:7px 12px;border-radius:8px;font-size:.73rem;
+  background:var(--glass);border:1px solid var(--border);
+  color:rgba(255,255,255,.5);cursor:pointer;transition:all .2s;text-align:left;
+}
+.chip:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.2)}
+
+/* ══ COMPLETION OVERLAY ══ */
+.completion-overlay{
+  position:fixed;inset:0;background:rgba(9,22,40,.9);backdrop-filter:blur(12px);
+  display:none;align-items:center;justify-content:center;z-index:500;flex-direction:column;gap:24px;
+  text-align:center;
+}
+.completion-overlay.show{display:flex}
+.completion-card{
+  background:var(--sidebar-bg);border:1px solid var(--border);
+  border-radius:24px;padding:48px 56px;max-width:460px;
+}
+.completion-icon{font-size:3.5rem;margin-bottom:20px}
+.completion-title{font-size:1.8rem;font-weight:700;margin-bottom:12px}
+.completion-sub{font-size:.9rem;color:rgba(255,255,255,.5);line-height:1.7;margin-bottom:32px}
+.completion-actions{display:flex;gap:12px;justify-content:center}
+.c-btn{
+  padding:12px 24px;border-radius:12px;font-size:.85rem;font-weight:600;
+  cursor:pointer;transition:all .2s;border:1px solid var(--border);
+  background:var(--glass);color:rgba(255,255,255,.7);font-family:'Poppins',sans-serif;
+}
+.c-btn:hover{background:rgba(255,255,255,.12);color:#fff}
+.c-btn.primary{
+  background:var(--persona-color);border-color:var(--persona-color);color:#fff;
+}
+.c-btn.primary:hover{opacity:.85}
+</style>
+</head>
+<body>
+
+<!-- ══ TOP BAR ══ -->
+<div class="top-bar">
+  <div class="top-logo">
+    <svg viewBox="0 0 120 32" fill="none">
+      <path d="M8 8L16 24L24 8" stroke="#D9232D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="30" y="22" font-family="Poppins,sans-serif" font-weight="700" font-size="16" fill="#ffffff">moglix</text>
+    </svg>
+  </div>
+  <div class="top-nav">
+    <div class="breadcrumb">
+      <a href="index.html">PBI Guide</a>
+      <span class="sep">›</span>
+      <span class="current" id="bc-persona">—</span>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+    </div>
+    <span id="progress-pct" style="font-size:.7rem;color:rgba(255,255,255,.3);white-space:nowrap">0%</span>
+  </div>
+  <div class="top-actions">
+    <div class="btn-icon" id="ann-toggle-btn" title="Toggle annotations (A)" onclick="toggleAnnotations()">💡</div>
+    <div class="btn-icon" id="chat-toggle-btn" title="AI Assistant (C)" onclick="toggleChat()">🤖</div>
+    <div class="btn-icon" title="Change persona" onclick="window.location.href='index.html'">↩</div>
+  </div>
+</div>
+
+<!-- ══ LAYOUT ══ -->
+<div class="layout">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <div class="sidebar-inner" id="sidebar-nav"></div>
+    <div class="sidebar-footer">
+      <div class="ar-credit"><span class="ar-mono-sm">AR</span> · Moglix Analytics Lab</div>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <div class="main">
+    <div class="step-view" id="step-view">
+
+      <!-- Step header -->
+      <div class="step-header">
+        <div class="step-meta">
+          <div class="step-section-label" id="step-section-label">Section</div>
+          <div class="step-title" id="step-title">Step Title</div>
+          <div class="step-counter" id="step-counter">Step 1 of 3</div>
+        </div>
+        <div class="persona-badge" id="persona-badge-top">—</div>
+      </div>
+
+      <!-- Screenshot viewer -->
+      <div class="screenshot-wrap" id="screenshot-wrap">
+        <!-- image -->
+        <img class="screenshot-img" id="screenshot-img" style="display:none" alt="Guide screenshot">
+        <!-- placeholder shown when no image -->
+        <div class="screenshot-placeholder" id="screenshot-ph">
+          <div class="ph-icon">📸</div>
+          <div class="ph-text">Screenshot will appear here.<br>Drop your numbered PNG in the folder below.</div>
+          <div class="ph-path" id="ph-path">screenshots/city-head/1.png</div>
+        </div>
+        <!-- annotation layer -->
+        <div class="annotation-layer" id="annotation-layer"></div>
+        <!-- controls -->
+        <div class="annotation-controls">
+          <div class="ann-toggle on" id="ann-label" onclick="toggleAnnotations()">💡 Annotations ON</div>
+        </div>
+      </div>
+
+      <!-- Caption -->
+      <div class="caption-box">
+        <div class="caption-text" id="caption-text">—</div>
+        <div class="key-points" id="key-points"></div>
+      </div>
+
+    </div><!-- /step-view -->
+
+    <!-- Bottom nav -->
+    <div class="step-nav">
+      <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">← Previous</button>
+      <div class="nav-center" id="nav-center">
+        Step <strong id="nav-step">1</strong> of <strong id="nav-total">1</strong>
+        <br><span class="kbd">←</span><span class="kbd">→</span> to navigate
+      </div>
+      <button class="nav-btn primary" id="next-btn" onclick="navigate(1)">Next →</button>
+    </div>
+  </div><!-- /main -->
+
+  <!-- ── Chatbot Panel ── -->
+  <div class="chat-panel" id="chat-panel">
+    <div class="chat-header">
+      <div class="chat-title">
+        <div class="ai-dot"></div>
+        AI Assistant
+      </div>
+      <div class="btn-icon" onclick="toggleChat()">✕</div>
+    </div>
+
+    <!-- API key setup -->
+    <div class="chat-api-setup" id="api-setup">
+      <div class="api-label">CLAUDE API KEY (stored locally, never sent to server)</div>
+      <div class="api-row">
+        <input type="password" class="api-input" id="api-key-input" placeholder="sk-ant-...">
+        <button class="api-save" onclick="saveApiKey()">Save</button>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="chat-messages" id="chat-messages">
+      <div class="msg ai" id="greeting-msg">
+        Hi! I'm your Power BI guide assistant. Ask me anything about the Moglix reports — how to navigate, where to find metrics, how to export data, or what a specific number means.
+      </div>
+    </div>
+
+    <!-- Suggestion chips -->
+    <div class="suggestions" id="suggestions">
+      <div class="sugg-label">QUICK QUESTIONS</div>
+    </div>
+
+    <!-- Input -->
+    <div class="chat-input-wrap">
+      <div class="chat-input-row">
+        <textarea class="chat-input" id="chat-input" placeholder="Ask about this report..." rows="1"
+          onkeydown="handleChatKey(event)"></textarea>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()">➤</button>
+      </div>
+      <div class="chat-hint">Powered by Claude · Your API key stays in your browser</div>
+    </div>
+  </div>
+
+</div><!-- /layout -->
+
+<!-- Completion overlay -->
+<div class="completion-overlay" id="completion-overlay">
+  <div class="completion-card">
+    <div class="completion-icon">🎉</div>
+    <div class="completion-title">Section Complete!</div>
+    <div class="completion-sub" id="completion-msg">You've finished this section. Ready to continue?</div>
+    <div class="completion-actions">
+      <button class="c-btn" onclick="closeCompletion()">Stay Here</button>
+      <button class="c-btn primary" id="completion-next-btn" onclick="nextSection()">Next Section →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     GUIDE DATA
+     ══════════════════════════════════════════
+  HOW TO POPULATE:
+  1. Create folders: pbi-guide/screenshots/city-head/, /sic/, /analyst/
+  2. Name screenshots: 1.png, 2.png, 3.png... in the order they appear
+  3. Update each step's `img`, `caption`, `keyPoints`, and `annotations` fields
+  4. Annotations use % coordinates (0-100) relative to the screenshot container:
+     - highlight: draws a colored box over a region
+     - callout:   draws a numbered bubble at a point with a tooltip
+  ══════════════════════════════════════════ -->
+<script>
+const GUIDE_DATA = {
+  'city-head': {
+    label: 'City Head',
+    color: '#D9232D',
+    rgb: '217,35,45',
+    greeting: "Hi! I'm your City Head guide. Ask me about P&L dashboards, GMV tracking, regional comparisons, or how to read the Monday weekly report.",
+    chips: [
+      'Where do I find this week\'s GMV vs last week?',
+      'How do I see region-wise performance?',
+      'What does ASP mean in this dashboard?',
+      'How do I export the P&L summary to Excel?',
+    ],
+    sections: [
+      {
+        title: 'Dashboard Overview',
+        steps: [
+          {
+            img: 'screenshots/city-head/1.png',
+            caption: 'This is the main Power BI dashboard home screen for City Heads. When you first open Power BI, you will land here. The top navigation bar lets you switch between different report sections.',
+            keyPoints: [
+              { icon: '👆', text: 'Click the report name in the left panel to open any report' },
+              { icon: '🔄', text: 'Data refreshes automatically — check the "Last refreshed" timestamp at the bottom right' },
+            ],
+            annotations: [
+              { type: 'callout', x: 12, y: 8, label: '1', text: 'Navigation pane — click any report to open it', color: '#D9232D' },
+              { type: 'callout', x: 75, y: 92, label: '2', text: 'Last refreshed timestamp — data updates every morning by 9 AM', color: '#D9232D' },
+            ]
+          },
+          {
+            img: 'screenshots/city-head/2.png',
+            caption: 'The City Head home page shows your key KPIs at a glance — today\'s GMV, number of orders, and Average Selling Price (ASP). These cards update in real time during business hours.',
+            keyPoints: [
+              { icon: '📌', text: 'Green arrow = above target, Red arrow = below target vs same day last week' },
+            ],
+            annotations: [
+              { type: 'highlight', x: 5, y: 10, w: 90, h: 22, color: 'rgba(217,35,45,.08)', outline: 'rgba(217,35,45,.4)', label: '1', text: 'KPI cards row — GMV · Orders · ASP · Return %' },
+            ]
+          }
+        ]
+      },
+      {
+        title: 'P&L Summary View',
+        steps: [
+          {
+            img: 'screenshots/city-head/3.png',
+            caption: 'The P&L Summary view shows your city\'s financial performance for the selected period. Use the date slicer at the top to switch between weekly, monthly, and quarterly views.',
+            keyPoints: [
+              { icon: '📅', text: 'Default view is current month MTD. Change via the date filter in the top-right' },
+              { icon: '💡', text: 'Hover over any bar to see the exact rupee value as a tooltip' },
+            ],
+            annotations: [
+              { type: 'callout', x: 88, y: 5, label: '1', text: 'Date slicer — select Week / Month / Quarter', color: '#D9232D' },
+            ]
+          },
+          {
+            img: 'screenshots/city-head/4.png',
+            caption: 'The waterfall chart breaks down how you moved from Gross GMV to Net Revenue — showing deductions like returns, cancellations, and platform fees at each step.',
+            keyPoints: [
+              { icon: '🔴', text: 'Red bars are deductions (returns, fees). Green bars are additions (other income)' },
+              { icon: '🎯', text: 'The final bar is your Net Revenue — this is what drives your P&L score' },
+            ],
+            annotations: []
+          },
+          {
+            img: 'screenshots/city-head/5.png',
+            caption: 'Category-level P&L breakdown. Click any category row to drill down into sub-categories and see which product lines are driving or dragging performance.',
+            keyPoints: [
+              { icon: '👆', text: 'Click a row to drill down — click again to drill back up' },
+            ],
+            annotations: [
+              { type: 'callout', x: 5, y: 50, label: '1', text: 'Click any row to drill into sub-category detail', color: '#D9232D' },
+            ]
+          }
+        ]
+      },
+      {
+        title: 'Regional Performance',
+        steps: [
+          {
+            img: 'screenshots/city-head/6.png',
+            caption: 'The Region Map shows performance across your zones visually. Bubble size = GMV volume. Color intensity = achievement vs target. Hover over any zone bubble for exact numbers.',
+            keyPoints: [
+              { icon: '🗺️', text: 'Darker color = higher % achievement vs target for that zone' },
+            ],
+            annotations: []
+          },
+          {
+            img: 'screenshots/city-head/7.png',
+            caption: 'The Region Table gives you a sortable list view of all regions with GMV, orders, ASP, and achievement %. Click any column header to sort ascending or descending.',
+            keyPoints: [
+              { icon: '⬇️', text: 'Sort by "Ach%" to quickly find your best and worst performing regions' },
+              { icon: '📤', text: 'Right-click any visual → Export data to get this as Excel' },
+            ],
+            annotations: [
+              { type: 'callout', x: 95, y: 5, label: '1', text: 'Right-click here → Export data → Excel', color: '#D9232D' },
+            ]
+          }
+        ]
+      },
+      {
+        title: 'Weekly Report & Excel Export',
+        steps: [
+          {
+            img: 'screenshots/city-head/8.png',
+            caption: 'The Monday Weekly Report page is pre-formatted for sharing. It shows WoW (week-over-week) comparison, top-5 and bottom-5 regions, and category highlights.',
+            keyPoints: [
+              { icon: '📊', text: 'This view is designed to be screenshot and shared directly in WhatsApp/email' },
+              { icon: '⏱️', text: 'Best viewed on Monday mornings after the weekend data batch loads (9:30 AM)' },
+            ],
+            annotations: []
+          },
+          {
+            img: 'screenshots/city-head/9.png',
+            caption: 'To export the full dataset to Excel, go to any table visual → right-click → "Export data". You can choose to export summarized data or the underlying row-level data.',
+            keyPoints: [
+              { icon: '⚠️', text: 'Underlying data export may be restricted by your Power BI admin settings' },
+              { icon: '✅', text: 'Summarized data export is always available — this covers 95% of use cases' },
+            ],
+            annotations: [
+              { type: 'highlight', x: 20, y: 30, w: 60, h: 40, color: 'rgba(217,35,45,.06)', outline: 'rgba(217,35,45,.35)', label: '1', text: 'Right-click this table → Export data' },
+            ]
+          }
+        ]
+      }
+    ]
+  },
+
+  'sic': {
+    label: 'SIC / AM',
+    color: '#2563EB',
+    rgb: '37,99,235',
+    greeting: "Hi! I'm your operational guide assistant. Ask me about filters, drill-through, period comparison, or how to export any report to Excel.",
+    chips: [
+      'How do I filter by my plant / store?',
+      'How do I compare this month vs last month?',
+      'How does drill-through work?',
+      'Where do I find SKU-level sales data?',
+    ],
+    sections: [
+      {
+        title: 'Accessing Your Reports',
+        steps: [
+          {
+            img: 'screenshots/sic/1.png',
+            caption: 'Log in to Power BI at app.powerbi.com with your Moglix email. Your reports are shared under the "Moglix Analytics" workspace. You\'ll see this workspace listed in the left navigation.',
+            keyPoints: [
+              { icon: '🔑', text: 'Use your @moglix.com email to sign in. Contact IT if you don\'t have access' },
+              { icon: '⭐', text: 'Star your most-used reports to pin them to the "Favorites" section' },
+            ],
+            annotations: [
+              { type: 'callout', x: 5, y: 40, label: '1', text: 'Workspaces list — find "Moglix Analytics" here', color: '#2563EB' },
+            ]
+          },
+          {
+            img: 'screenshots/sic/2.png',
+            caption: 'Once inside the workspace, you\'ll see the reports available to you based on your role. SIC and AM users see the Operational Dashboard, Plant-Level Report, and SKU Analysis.',
+            keyPoints: [
+              { icon: '📋', text: 'Reports with a clock icon have scheduled refreshes — data is always current' },
+            ],
+            annotations: []
+          }
+        ]
+      },
+      {
+        title: 'Applying Filters',
+        steps: [
+          {
+            img: 'screenshots/sic/3.png',
+            caption: 'The Filters panel is on the right side of every report. Click the funnel icon to expand it. You can filter by Plant, Date Range, Category, and more depending on the report.',
+            keyPoints: [
+              { icon: '🔍', text: 'Filters applied here affect ALL visuals on the page simultaneously' },
+              { icon: '💡', text: 'Use Ctrl+click to multi-select values (e.g. select 3 plants at once)' },
+            ],
+            annotations: [
+              { type: 'callout', x: 92, y: 50, label: '1', text: 'Click the funnel icon to expand the Filters pane', color: '#2563EB' },
+            ]
+          },
+          {
+            img: 'screenshots/sic/4.png',
+            caption: 'The Plant Slicer is a quick-select at the top of the operational dashboard. Click your plant name to instantly filter all data to your plant. You can also search by typing.',
+            keyPoints: [
+              { icon: '🏭', text: 'Your default plant may be pre-selected if your admin has configured it' },
+            ],
+            annotations: [
+              { type: 'highlight', x: 2, y: 5, w: 30, h: 88, color: 'rgba(37,99,235,.06)', outline: 'rgba(37,99,235,.35)', label: '1', text: 'Plant slicer — click your plant to filter' },
+            ]
+          },
+          {
+            img: 'screenshots/sic/5.png',
+            caption: 'Date Range filter lets you select custom periods. Use the "Relative date" option to easily pick "Last 7 days", "Last month", or "Last quarter" without picking specific dates.',
+            keyPoints: [
+              { icon: '📅', text: 'Relative date filters update automatically — no need to change them daily' },
+            ],
+            annotations: []
+          }
+        ]
+      },
+      {
+        title: 'Drill-Through to Details',
+        steps: [
+          {
+            img: 'screenshots/sic/6.png',
+            caption: 'Drill-through lets you right-click any data point and jump to a detail page scoped to that item. For example, right-click a category row → "Drill through" → "SKU Detail" to see all SKUs in that category.',
+            keyPoints: [
+              { icon: '🖱️', text: 'Right-click any row, bar, or bubble → look for "Drill through" in the menu' },
+              { icon: '🔙', text: 'Use the back arrow (top-left of the detail page) to return to the summary view' },
+            ],
+            annotations: [
+              { type: 'callout', x: 50, y: 50, label: '1', text: 'Right-click any data point here to see drill-through option', color: '#2563EB' },
+            ]
+          },
+          {
+            img: 'screenshots/sic/7.png',
+            caption: 'The SKU Detail drill-through page shows every SKU in the selected category with quantity sold, revenue, returns, and stock status. This is your self-serve view for granular analysis.',
+            keyPoints: [
+              { icon: '🔴', text: 'Red highlighted rows = return rate above threshold for that SKU' },
+              { icon: '📤', text: 'Export this table to Excel for offline analysis (right-click → Export)' },
+            ],
+            annotations: []
+          }
+        ]
+      },
+      {
+        title: 'Period Comparison',
+        steps: [
+          {
+            img: 'screenshots/sic/8.png',
+            caption: 'The Period Comparison view has two side-by-side panels. Left = current period, Right = comparison period. Use the dropdowns to set each period independently.',
+            keyPoints: [
+              { icon: '📊', text: 'Common comparison: Current month MTD vs Same period last year' },
+            ],
+            annotations: [
+              { type: 'callout', x: 48, y: 5, label: '1', text: 'Divider — left side = period A, right side = period B', color: '#2563EB' },
+            ]
+          },
+          {
+            img: 'screenshots/sic/9.png',
+            caption: 'The delta column (Δ) shows absolute and percentage change between the two periods. Green = improvement, Red = decline. Click any metric row to highlight it across both periods.',
+            keyPoints: [
+              { icon: '💡', text: 'Click the column header "Δ%" to sort by biggest movers' },
+            ],
+            annotations: []
+          }
+        ]
+      },
+      {
+        title: 'Self-Serve Excel Export',
+        steps: [
+          {
+            img: 'screenshots/sic/10.png',
+            caption: 'To export any table to Excel: right-click the visual → "Export data". For summarized data (what you see in the table), choose "Summarized data". This works for all table and matrix visuals.',
+            keyPoints: [
+              { icon: '✅', text: 'Summarized data = the aggregated table as shown. Always available.' },
+              { icon: '⚠️', text: 'Underlying data = row-level raw data. May need admin permission.' },
+            ],
+            annotations: [
+              { type: 'highlight', x: 25, y: 35, w: 50, h: 35, color: 'rgba(37,99,235,.06)', outline: 'rgba(37,99,235,.35)', label: '1', text: 'Right-click anywhere on this visual to get the Export option' },
+            ]
+          },
+          {
+            img: 'screenshots/sic/11.png',
+            caption: 'After export, the file downloads as a .xlsx. It includes all filtered data — so if you had your plant selected, the Excel will only contain your plant\'s data. Open in Excel and it\'s ready to use.',
+            keyPoints: [
+              { icon: '📁', text: 'Find the downloaded file in your browser\'s default Downloads folder' },
+              { icon: '🔄', text: 'The export is a snapshot — re-export for fresh data' },
+            ],
+            annotations: []
+          }
+        ]
+      }
+    ]
+  },
+
+  'analyst': {
+    label: 'Central Analyst',
+    color: '#C9A227',
+    rgb: '201,162,39',
+    greeting: "Hi! I'm your analytical guide. Ask me about DAX measures, data lineage, cross-region views, model structure, or any advanced self-serve technique.",
+    chips: [
+      'How is GMV calculated in the model?',
+      'What\'s the data source for the P&L report?',
+      'How do I see data for all regions at once?',
+      'Which DAX measure drives the achievement %?',
+    ],
+    sections: [
+      {
+        title: 'Report Architecture Overview',
+        steps: [
+          {
+            img: 'screenshots/analyst/1.png',
+            caption: 'The Moglix Power BI ecosystem has three report layers: Raw (ETL outputs), Semantic (Power BI data model with DAX), and Presentation (report pages users see). As an analyst, you have access to all three.',
+            keyPoints: [
+              { icon: '🏗️', text: 'ETL runs nightly at 2 AM via Azure Data Factory. Data is available in Power BI by 8 AM.' },
+              { icon: '📐', text: 'All KPI definitions live in the Semantic layer — this is the single source of truth' },
+            ],
+            annotations: []
+          },
+          {
+            img: 'screenshots/analyst/2.png',
+            caption: 'The Power BI data model. Star schema with FactSales at the center, connected to DimDate, DimProduct, DimPlant, DimCategory, and DimCustomer. All relationships are single-direction.',
+            keyPoints: [
+              { icon: '⭐', text: 'FactSales is the primary fact table — it contains transaction-level records' },
+              { icon: '🔗', text: 'DimPlant connects Plant → Team → Region hierarchy' },
+            ],
+            annotations: [
+              { type: 'callout', x: 45, y: 45, label: '1', text: 'FactSales — central fact table, ~50M rows', color: '#C9A227' },
+            ]
+          }
+        ]
+      },
+      {
+        title: 'DAX Measures Logic',
+        steps: [
+          {
+            img: 'screenshots/analyst/3.png',
+            caption: 'Key DAX measures explained. GMV = sum of (qty × MRP) before any deductions. Net Revenue = GMV - Returns - Cancellations - Platform Fees. Achievement% = Actual GMV / Target GMV.',
+            keyPoints: [
+              { icon: '📐', text: 'All monetary measures use INR by default. No currency conversion applied.' },
+              { icon: '💡', text: 'Time-intelligence measures (MTD, YTD, WoW) use DimDate[DateKey] as the reference column' },
+            ],
+            annotations: []
+          },
+          {
+            img: 'screenshots/analyst/4.png',
+            caption: 'The Measures table in Power BI Desktop. All measures are organized into folders: _KPIs (headline numbers), _TimeIntelligence (MTD/YTD/WoW), _Ratios (%), _Targets (goal values).',
+            keyPoints: [
+              { icon: '📁', text: 'Prefix _ ensures measure folders sort to top of the field list' },
+              { icon: '🚫', text: 'Do not modify measures in the shared dataset — use Composite Model to add your own' },
+            ],
+            annotations: [
+              { type: 'callout', x: 5, y: 30, label: '1', text: 'Measures table — all calculated measures live here', color: '#C9A227' },
+            ]
+          },
+          {
+            img: 'screenshots/analyst/5.png',
+            caption: 'Composite Models allow you to extend the shared dataset with your own measures and tables without modifying the original. In Power BI Desktop: File → Options → Preview features → enable Composite Models.',
+            keyPoints: [
+              { icon: '✅', text: 'This is the recommended way to add custom analysis on top of official data' },
+            ],
+            annotations: []
+          }
+        ]
+      },
+      {
+        title: 'Cross-Region Analysis',
+        steps: [
+          {
+            img: 'screenshots/analyst/6.png',
+            caption: 'The All-Regions view removes the regional filter. By default, report pages filter to the logged-in user\'s region (Row-Level Security). Use the Region override slicer to see all regions — requires Analyst role.',
+            keyPoints: [
+              { icon: '🌍', text: 'Your Analyst role grants access to all regions. City Head users can only see their own.' },
+            ],
+            annotations: [
+              { type: 'highlight', x: 2, y: 60, w: 25, h: 30, color: 'rgba(201,162,39,.08)', outline: 'rgba(201,162,39,.4)', label: '1', text: 'Region override slicer — select "All" to see across all regions' },
+            ]
+          },
+          {
+            img: 'screenshots/analyst/7.png',
+            caption: 'Cross-region matrix shows Region × Category performance. Use the Value type toggle to switch between absolute INR, % of total, or index vs average. Conditional formatting highlights outliers.',
+            keyPoints: [
+              { icon: '🔥', text: 'Dark red = significantly below average. Dark green = significantly above average.' },
+              { icon: '📤', text: 'Export this matrix to Excel — the conditional formatting is preserved in the download' },
+            ],
+            annotations: []
+          },
+          {
+            img: 'screenshots/analyst/8.png',
+            caption: 'The Analyst Sandbox report page has no Row-Level Security and includes additional debug fields (source system, load timestamp, pipeline ID). Use this for data validation and reconciliation.',
+            keyPoints: [
+              { icon: '🔬', text: 'Sandbox page is only visible to users with Analyst role — it won\'t appear for City Heads/SICs' },
+              { icon: '⚠️', text: 'Do not share screenshots of the Sandbox page externally — it contains internal pipeline metadata' },
+            ],
+            annotations: []
+          }
+        ]
+      },
+      {
+        title: 'Data Lineage & Validation',
+        steps: [
+          {
+            img: 'screenshots/analyst/9.png',
+            caption: 'Power BI Lineage View (available in the workspace) shows the full data flow from source systems → Dataflows → Datasets → Reports. Use this to understand upstream dependencies before making changes.',
+            keyPoints: [
+              { icon: '🔗', text: 'Click any node in the lineage view to see its refresh history and dependencies' },
+            ],
+            annotations: [
+              { type: 'callout', x: 90, y: 50, label: '1', text: 'Click "Lineage" view in workspace header to open this', color: '#C9A227' },
+            ]
+          },
+          {
+            img: 'screenshots/analyst/10.png',
+            caption: 'Data validation checklist. Before trusting any new metric, cross-check: (1) Total GMV matches ERP daily dump, (2) Returns % aligns with OMS data, (3) Plant count matches active plant list in HR system.',
+            keyPoints: [
+              { icon: '✅', text: 'Tolerance threshold: ±0.5% variance vs source system is acceptable (rounding differences)' },
+              { icon: '🚨', text: 'Variance > 2% = raise a data quality ticket to the Analytics team immediately' },
+            ],
+            annotations: []
+          }
+        ]
+      },
+      {
+        title: 'Advanced Self-Serve Tips',
+        steps: [
+          {
+            img: 'screenshots/analyst/11.png',
+            caption: 'Personal bookmarks let you save a specific filter state and come back to it instantly. Click the Bookmarks pane icon → "Add a personal bookmark" → name it. Your bookmarks are private to your account.',
+            keyPoints: [
+              { icon: '🔖', text: 'Great for saving your standard weekly analysis filter set — no re-filtering every time' },
+            ],
+            annotations: []
+          },
+          {
+            img: 'screenshots/analyst/12.png',
+            caption: 'Subscribe to a report page to get a PDF snapshot emailed on a schedule. In the top menu → Subscribe → set frequency (daily/weekly) and time. The email includes a snapshot of the current filtered view.',
+            keyPoints: [
+              { icon: '📧', text: 'Each subscriber gets their own filtered view based on their RLS — secure by design' },
+              { icon: '⏰', text: 'Schedule the email delivery 30 min after the data refresh completes (use 8:30 AM)' },
+            ],
+            annotations: [
+              { type: 'callout', x: 50, y: 5, label: '1', text: 'Subscribe button in the top action bar', color: '#C9A227' },
+            ]
+          }
+        ]
+      }
+    ]
+  }
+};
+
+// ══════════════════════════════════
+// SYSTEM PROMPT for AI Chatbot
+// ══════════════════════════════════
+const SYSTEM_PROMPTS = {
+  'city-head': `You are a Power BI help assistant for Moglix, an Indian B2B e-commerce platform. You are helping a City Head — a senior regional leader who uses Power BI for high-level strategic decisions.
+
+Key context about Moglix Power BI reports:
+- Reports cover: GMV (Gross Merchandise Value), Orders, ASP (Average Selling Price), P&L (Profit & Loss), Returns, Category performance, Regional benchmarking
+- Hierarchy: Company → Region → City → Plant → Team
+- City Head sees their city's data only (Row-Level Security applied)
+- Data refreshes nightly, available by 8-9 AM every morning
+- Key pages: Dashboard Home (KPIs), P&L Summary, Regional Map, Weekly Report
+- Excel export: right-click any table visual → Export data → Summarized data
+- Date slicers: Week / Month / Quarter / Custom range
+- GMV = sum of (quantity × MRP) before deductions
+- Achievement% = Actual GMV / Target GMV
+- Color coding: Green = above target, Red = below target
+
+Answer questions about: how to navigate, where to find data, what metrics mean, how to export. Keep answers concise (2-4 sentences). If you don't know, say so honestly.`,
+
+  'sic': `You are a Power BI help assistant for Moglix, an Indian B2B e-commerce platform. You are helping a SIC (Store-in-Charge) or Area Manager — an operational user who works with granular plant-level data daily.
+
+Key context:
+- Hierarchy: Plant → Team → Region → City → Company
+- SIC sees their own plant(s) data only (Row-Level Security applied)
+- Key features they use: Filters/Slicers, Drill-through to SKU level, Period comparison, Excel export
+- Filter panel: right side of every report (funnel icon)
+- Plant slicer: at top of operational dashboard, supports multi-select (Ctrl+click)
+- Drill-through: right-click any table row → Drill through → Detail page
+- Period comparison: two-panel view, left = current period, right = comparison period, Δ column shows change
+- Excel export: right-click visual → Export data → Summarized data (always available)
+- Relative date filters: "Last 7 days", "Last month" update automatically
+- SKU-level data available via drill-through from category rows
+- Return rate threshold: highlighted in red if above acceptable level
+
+Answer questions about: how to filter, how to use drill-through, how to compare periods, how to export. Keep answers concise (2-4 sentences).`,
+
+  'analyst': `You are a Power BI help assistant for Moglix, an Indian B2B e-commerce platform. You are helping a Central Analyst — an advanced user with cross-region access and deep understanding of the data model.
+
+Key context about the Moglix Power BI architecture:
+- Stack: Azure Data Factory (ETL, runs 2 AM) → Azure SQL / Data Lake → Power BI Dataflows → Power BI Datasets → Reports
+- Data model: Star schema — FactSales (50M+ rows) at center, DimDate, DimProduct, DimPlant, DimCategory, DimCustomer
+- DimPlant hierarchy: Plant → Team → Region
+- RLS (Row-Level Security): City Heads/SICs see their region only. Analysts see all regions.
+- DAX measure folders: _KPIs, _TimeIntelligence, _Ratios, _Targets
+- GMV = SUM(FactSales[Qty] * FactSales[MRP])
+- Net Revenue = GMV - Returns - Cancellations - PlatformFees
+- Achievement% = [Actual GMV] / [Target GMV]
+- Time intelligence uses DimDate[DateKey] as reference
+- Composite Models: extend shared dataset with custom measures without modifying original
+- Lineage view: available in workspace header, shows full data flow
+- Analyst Sandbox: no RLS, includes pipeline metadata, not for external sharing
+- Validation tolerance: ±0.5% vs source systems acceptable; >2% = raise data quality ticket
+- Personal bookmarks: save filter states, private to user
+- Report subscriptions: PDF snapshots via email on schedule (set to 8:30 AM after 8 AM refresh)
+
+Answer technical questions about DAX, data model, RLS, lineage, and advanced features. Be specific and technical where needed.`
+};
+
+// ══════════════════════════════════
+// STATE
+// ══════════════════════════════════
+let persona = new URLSearchParams(window.location.search).get('persona') || 'city-head';
+let personaData = GUIDE_DATA[persona];
+let flatSteps = []; // {sectionIdx, stepIdx, section, step}
+let currentFlat = 0;
+let annotationsVisible = true;
+let chatOpen = false;
+let apiKey = localStorage.getItem('pbi_claude_key') || '';
+let chatHistory = [];
+
+// ══════════════════════════════════
+// INIT
+// ══════════════════════════════════
+function init() {
+  if(!personaData) {
+    window.location.href = 'index.html';
+    return;
+  }
+
+  // Set CSS variable for persona color
+  document.documentElement.style.setProperty('--persona-color', personaData.color);
+  document.documentElement.style.setProperty('--persona-rgb', personaData.rgb);
+
+  // Breadcrumb
+  document.getElementById('bc-persona').textContent = personaData.label;
+
+  // Persona badge
+  document.getElementById('persona-badge-top').textContent = personaData.label;
+
+  // Flatten steps
+  personaData.sections.forEach((section, si) => {
+    section.steps.forEach((step, sti) => {
+      flatSteps.push({ sectionIdx: si, stepIdx: sti, section, step });
+    });
+  });
+
+  // Load saved progress
+  const saved = parseInt(localStorage.getItem(`pbi_progress_${persona}`) || '0');
+  currentFlat = Math.min(saved, flatSteps.length - 1);
+
+  // Build sidebar
+  buildSidebar();
+
+  // Setup chat
+  setupChat();
+
+  // Render current step
+  renderStep();
+
+  // Keyboard nav
+  document.addEventListener('keydown', handleKey);
+}
+
+function buildSidebar() {
+  const nav = document.getElementById('sidebar-nav');
+  nav.innerHTML = '';
+
+  personaData.sections.forEach((section, si) => {
+    const group = document.createElement('div');
+    group.className = 'section-group';
+    group.id = `sg-${si}`;
+
+    const stepsHtml = section.steps.map((step, sti) => {
+      const fi = flatIndex(si, sti);
+      return `<div class="step-dot" id="sd-${fi}" onclick="goToFlat(${fi})">
+        <span class="dot"></span>
+        <span>${step.caption ? step.caption.substring(0,45)+'…' : `Step ${sti+1}`}</span>
+      </div>`;
+    }).join('');
+
+    group.innerHTML = `
+      <div class="section-header" id="sh-${si}" onclick="toggleSection(${si})">
+        <span class="s-num">${si+1}</span>
+        <span class="s-title">${section.title}</span>
+      </div>
+      <div class="section-steps" id="ss-${si}">${stepsHtml}</div>
+    `;
+    nav.appendChild(group);
+  });
+}
+
+function flatIndex(si, sti) {
+  let idx = 0;
+  for(let i=0;i<si;i++) idx += personaData.sections[i].steps.length;
+  return idx + sti;
+}
+
+function toggleSection(si) {
+  const steps = document.getElementById(`ss-${si}`);
+  steps.classList.toggle('open');
+}
+
+function goToFlat(fi) {
+  currentFlat = fi;
+  renderStep();
+}
+
+// ══════════════════════════════════
+// RENDER STEP
+// ══════════════════════════════════
+function renderStep() {
+  const {sectionIdx, stepIdx, section, step} = flatSteps[currentFlat];
+
+  // Save progress
+  localStorage.setItem(`pbi_progress_${persona}`, currentFlat);
+
+  // Update header
+  document.getElementById('step-section-label').textContent = `Section ${sectionIdx+1} · ${section.title}`;
+  document.getElementById('step-title').textContent = step.caption ? step.caption.substring(0,70)+'…' : 'Step';
+
+  // Actually use a shorter title — just first sentence
+  const firstSentence = step.caption ? step.caption.split('.')[0] : 'Step';
+  document.getElementById('step-title').textContent = firstSentence;
+
+  document.getElementById('step-counter').textContent = `Step ${stepIdx+1} of ${section.steps.length} in this section`;
+
+  // Screenshot
+  const img = document.getElementById('screenshot-img');
+  const ph = document.getElementById('screenshot-ph');
+  document.getElementById('ph-path').textContent = step.img;
+
+  if(step.img) {
+    img.src = step.img;
+    img.onload = () => { img.style.display='block'; ph.style.display='none'; };
+    img.onerror = () => { img.style.display='none'; ph.style.display='flex'; };
+  } else {
+    img.style.display='none';
+    ph.style.display='flex';
+  }
+
+  // Caption
+  document.getElementById('caption-text').textContent = step.caption || '';
+
+  // Key points
+  const kp = document.getElementById('key-points');
+  kp.innerHTML = '';
+  if(step.keyPoints && step.keyPoints.length) {
+    step.keyPoints.forEach(pt => {
+      const div = document.createElement('div');
+      div.className = 'key-point';
+      div.innerHTML = `<span class="kp-icon">${pt.icon}</span><span>${pt.text}</span>`;
+      kp.appendChild(div);
+    });
+  }
+
+  // Annotations
+  renderAnnotations(step.annotations || []);
+
+  // Sidebar: mark done steps + open current section
+  flatSteps.forEach((fs, fi) => {
+    const dot = document.getElementById(`sd-${fi}`);
+    if(dot) {
+      dot.classList.remove('active','done');
+      if(fi === currentFlat) dot.classList.add('active');
+      else if(fi < currentFlat) dot.classList.add('done');
+    }
+  });
+  personaData.sections.forEach((s,si) => {
+    const sh = document.getElementById(`sh-${si}`);
+    const ss = document.getElementById(`ss-${si}`);
+    if(sh) {
+      sh.classList.remove('active','done');
+      const sectionStartFlat = flatIndex(si,0);
+      const sectionEndFlat = sectionStartFlat + s.steps.length - 1;
+      if(currentFlat >= sectionStartFlat && currentFlat <= sectionEndFlat) {
+        sh.classList.add('active');
+        if(ss) ss.classList.add('open');
+      } else if(currentFlat > sectionEndFlat) {
+        sh.classList.add('done');
+      }
+    }
+  });
+
+  // Nav buttons
+  document.getElementById('prev-btn').disabled = currentFlat === 0;
+  document.getElementById('nav-step').textContent = currentFlat+1;
+  document.getElementById('nav-total').textContent = flatSteps.length;
+  document.getElementById('next-btn').textContent = currentFlat < flatSteps.length-1 ? 'Next →' : 'Complete ✓';
+
+  // Progress bar
+  const pct = Math.round(((currentFlat+1)/flatSteps.length)*100);
+  document.getElementById('progress-bar').style.width = pct+'%';
+  document.getElementById('progress-pct').textContent = pct+'%';
+
+  // Scroll to top of step view
+  document.getElementById('step-view').scrollTo({top:0,behavior:'smooth'});
+
+  // Update chatbot suggestions
+  updateSuggestions();
+}
+
+function renderAnnotations(annotations) {
+  const layer = document.getElementById('annotation-layer');
+  layer.innerHTML = '';
+  if(!annotationsVisible || !annotations.length) return;
+
+  annotations.forEach((ann, idx) => {
+    if(ann.type === 'highlight') {
+      const el = document.createElement('div');
+      el.className = 'annotation-highlight';
+      el.style.cssText = `
+        left:${ann.x}%;top:${ann.y}%;width:${ann.w}%;height:${ann.h}%;
+        background:${ann.color};
+        outline:1.5px solid ${ann.outline};
+      `;
+      el.innerHTML = `<div class="annotation-tooltip">${ann.label ? '<strong>'+ann.label+'</strong><br>':''} ${ann.text}</div>`;
+      layer.appendChild(el);
+    } else if(ann.type === 'callout') {
+      const el = document.createElement('div');
+      el.className = 'annotation-callout';
+      const flip = ann.x > 60 ? 'flip' : '';
+      el.classList.add(...(flip?[flip]:[]));
+      el.style.cssText = `left:${ann.x}%;top:${ann.y}%;transform:translate(-50%,-50%)`;
+      el.innerHTML = `
+        <div class="callout-bubble" style="background:${ann.color||personaData.color}">${ann.label}</div>
+        <div class="annotation-tooltip">${ann.text}</div>
+      `;
+      layer.appendChild(el);
+    }
+  });
+}
+
+// ══════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════
+function navigate(dir) {
+  const next = currentFlat + dir;
+  if(next < 0 || next > flatSteps.length) return;
+
+  if(next === flatSteps.length) {
+    showCompletion();
+    return;
+  }
+
+  // Check if moving to a new section — show mini completion
+  const curSection = flatSteps[currentFlat].sectionIdx;
+  const newSection = flatSteps[next].sectionIdx;
+  if(dir > 0 && newSection > curSection) {
+    // Section boundary — just navigate, no overlay for sections in middle
+  }
+
+  currentFlat = next;
+  renderStep();
+}
+
+function handleKey(e) {
+  // Don't intercept if typing in chat
+  if(e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+  if(e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); navigate(1); }
+  if(e.key === 'ArrowLeft') { e.preventDefault(); navigate(-1); }
+  if(e.key === 'a' || e.key === 'A') toggleAnnotations();
+  if(e.key === 'c' || e.key === 'C') toggleChat();
+}
+
+// ══════════════════════════════════
+// ANNOTATIONS
+// ══════════════════════════════════
+function toggleAnnotations() {
+  annotationsVisible = !annotationsVisible;
+  const btn = document.getElementById('ann-label');
+  const iconBtn = document.getElementById('ann-toggle-btn');
+  btn.textContent = annotationsVisible ? '💡 Annotations ON' : '💡 Annotations OFF';
+  btn.classList.toggle('on', annotationsVisible);
+  iconBtn.classList.toggle('active', annotationsVisible);
+  renderAnnotations(flatSteps[currentFlat].step.annotations || []);
+}
+
+// ══════════════════════════════════
+// CHAT
+// ══════════════════════════════════
+function setupChat() {
+  const setup = document.getElementById('api-setup');
+  setup.classList.toggle('show', !apiKey);
+
+  // Greeting
+  document.getElementById('greeting-msg').textContent = personaData.greeting;
+
+  // Suggestions
+  updateSuggestions();
+}
+
+function updateSuggestions() {
+  const suggs = document.getElementById('suggestions');
+  suggs.innerHTML = '<div class="sugg-label">QUICK QUESTIONS</div>';
+  (personaData.chips || []).forEach(chip => {
+    const el = document.createElement('div');
+    el.className = 'chip';
+    el.textContent = chip;
+    el.onclick = () => sendChip(chip);
+    suggs.appendChild(el);
+  });
+}
+
+function sendChip(text) {
+  document.getElementById('chat-input').value = text;
+  sendMessage();
+}
+
+function saveApiKey() {
+  const val = document.getElementById('api-key-input').value.trim();
+  if(val) {
+    apiKey = val;
+    localStorage.setItem('pbi_claude_key', val);
+    document.getElementById('api-setup').classList.remove('show');
+    addMsg('api-saved', 'ai', 'API key saved! Your key stays in your browser. Ask me anything about the reports.');
+  }
+}
+
+function toggleChat() {
+  chatOpen = !chatOpen;
+  document.getElementById('chat-panel').classList.toggle('open', chatOpen);
+  document.getElementById('chat-toggle-btn').classList.toggle('active', chatOpen);
+}
+
+function handleChatKey(e) {
+  if(e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function addMsg(id, type, text) {
+  const msgs = document.getElementById('chat-messages');
+  const el = document.createElement('div');
+  el.className = `msg ${type}`;
+  if(id) el.id = id;
+  el.textContent = text;
+  msgs.appendChild(el);
+  msgs.scrollTop = msgs.scrollHeight;
+  return el;
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if(!text) return;
+
+  input.value = '';
+  addMsg(null, 'user', text);
+  chatHistory.push({role:'user', content:text});
+
+  if(!apiKey) {
+    addMsg(null, 'ai', 'Please enter your Claude API key above to enable AI responses. Your key is stored only in your browser.');
+    document.getElementById('api-setup').classList.add('show');
+    return;
+  }
+
+  const thinkingEl = addMsg('thinking-msg', 'ai thinking', '…');
+  document.getElementById('send-btn').disabled = true;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 500,
+        system: SYSTEM_PROMPTS[persona],
+        messages: chatHistory.slice(-10),
+      })
+    });
+
+    if(!resp.ok) {
+      const err = await resp.json().catch(()=>({}));
+      throw new Error(err.error?.message || `HTTP ${resp.status}`);
+    }
+
+    const data = await resp.json();
+    const reply = data.content?.[0]?.text || 'Sorry, I could not generate a response.';
+    chatHistory.push({role:'assistant', content:reply});
+
+    thinkingEl.classList.remove('thinking');
+    thinkingEl.textContent = reply;
+  } catch(err) {
+    thinkingEl.classList.remove('thinking');
+    if(err.message.includes('401') || err.message.includes('authentication')) {
+      thinkingEl.textContent = 'Invalid API key. Please check your key and try again.';
+      apiKey = '';
+      localStorage.removeItem('pbi_claude_key');
+      document.getElementById('api-setup').classList.add('show');
+    } else {
+      thinkingEl.textContent = `Error: ${err.message}`;
+    }
+  } finally {
+    document.getElementById('send-btn').disabled = false;
+  }
+}
+
+// ══════════════════════════════════
+// COMPLETION
+// ══════════════════════════════════
+function showCompletion() {
+  const totalSections = personaData.sections.length;
+  document.getElementById('completion-msg').textContent =
+    `You've completed all ${totalSections} sections of the ${personaData.label} guide. Great job!`;
+  document.getElementById('completion-next-btn').textContent = 'Go to Another Role →';
+  document.getElementById('completion-overlay').classList.add('show');
+}
+
+function closeCompletion() {
+  document.getElementById('completion-overlay').classList.remove('show');
+}
+
+function nextSection() {
+  closeCompletion();
+  window.location.href = 'index.html';
+}
+
+// ══════════════════════════════════
+// START
+// ══════════════════════════════════
+init();
+</script>
+</body>
+</html>

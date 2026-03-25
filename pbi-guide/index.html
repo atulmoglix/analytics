@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Power BI Guide — Moglix Analytics</title>
+<link rel="icon" href="../assets/moglix-favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --red:#D9232D;--red-dark:#b51c25;--red-glow:rgba(217,35,45,.18);
+  --navy:#0B1D3A;--navy-mid:#122849;--navy-light:#1a3660;
+  --gold:#C9A227;--gold-light:#E8D48B;
+  --white:#ffffff;--text:#333333;--muted:#666;
+  --glass:rgba(255,255,255,.06);--border:rgba(255,255,255,.12);
+}
+body{
+  font-family:'Poppins',sans-serif;
+  background:var(--navy);
+  color:var(--white);
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  background-image:
+    linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);
+  background-size:60px 60px;
+}
+
+/* ── Header ── */
+header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 40px;
+  border-bottom:1px solid var(--border);
+  background:rgba(11,29,58,.85);
+  backdrop-filter:blur(12px);
+  position:sticky;top:0;z-index:100;
+}
+.logo{display:flex;align-items:center;gap:12px}
+.logo svg{height:28px;width:auto}
+.logo-divider{width:1px;height:24px;background:var(--border)}
+.logo-text{font-size:.8rem;font-weight:500;color:rgba(255,255,255,.5);letter-spacing:.06em;text-transform:uppercase}
+.ar-pill{
+  display:flex;align-items:center;gap:8px;
+  padding:6px 14px;border-radius:20px;
+  background:rgba(201,162,39,.1);border:1px solid rgba(201,162,39,.3);
+  font-size:.75rem;color:var(--gold);font-weight:600;
+}
+.ar-mono{font-family:Georgia,serif;font-size:.9rem;font-weight:700}
+
+/* ── Hero ── */
+.hero{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:60px 40px 40px;text-align:center;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 16px;border-radius:20px;
+  background:var(--red-glow);border:1px solid rgba(217,35,45,.4);
+  font-size:.72rem;font-weight:600;color:var(--red);
+  letter-spacing:.08em;text-transform:uppercase;margin-bottom:28px;
+}
+.hero-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--red);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hero h1{
+  font-size:clamp(2rem,5vw,3.2rem);font-weight:700;line-height:1.15;
+  margin-bottom:16px;
+  background:linear-gradient(135deg,#fff 40%,rgba(255,255,255,.55));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero h1 span{
+  background:linear-gradient(135deg,var(--red),#ff6b6b);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero-sub{
+  font-size:1rem;color:rgba(255,255,255,.5);max-width:540px;
+  line-height:1.7;margin-bottom:56px;
+}
+
+/* ── Persona Cards ── */
+.persona-label{
+  font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(255,255,255,.35);font-weight:600;margin-bottom:20px;
+}
+.cards{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;max-width:900px}
+.card{
+  flex:1;min-width:240px;max-width:280px;
+  background:var(--glass);border:1px solid var(--border);
+  border-radius:20px;padding:32px 28px;cursor:pointer;
+  transition:all .25s ease;position:relative;overflow:hidden;
+  text-align:left;
+}
+.card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  transition:opacity .25s;
+}
+.card.red::before{background:linear-gradient(90deg,var(--red),#ff6b6b)}
+.card.blue::before{background:linear-gradient(90deg,#2563EB,#60A5FA)}
+.card.gold::before{background:linear-gradient(90deg,var(--gold),var(--gold-light))}
+.card:hover{
+  transform:translateY(-6px);
+  border-color:rgba(255,255,255,.25);
+  box-shadow:0 20px 50px rgba(0,0,0,.4);
+}
+.card.red:hover{box-shadow:0 20px 50px rgba(217,35,45,.25)}
+.card.blue:hover{box-shadow:0 20px 50px rgba(37,99,235,.25)}
+.card.gold:hover{box-shadow:0 20px 50px rgba(201,162,39,.25)}
+.card-icon{
+  width:52px;height:52px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;margin-bottom:20px;
+}
+.card.red .card-icon{background:rgba(217,35,45,.15)}
+.card.blue .card-icon{background:rgba(37,99,235,.15)}
+.card.gold .card-icon{background:rgba(201,162,39,.15)}
+.card-title{font-size:1.15rem;font-weight:700;margin-bottom:6px}
+.card-role{
+  font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;
+  font-weight:600;margin-bottom:16px;
+}
+.card.red .card-role{color:var(--red)}
+.card.blue .card-role{color:#60A5FA}
+.card.gold .card-role{color:var(--gold)}
+.card-desc{font-size:.82rem;color:rgba(255,255,255,.5);line-height:1.65;margin-bottom:24px}
+.card-topics{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:24px}
+.topic-tag{
+  padding:3px 10px;border-radius:12px;font-size:.68rem;font-weight:500;
+  background:rgba(255,255,255,.07);color:rgba(255,255,255,.6);
+  border:1px solid rgba(255,255,255,.1);
+}
+.card-cta{
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:.82rem;font-weight:600;
+}
+.card.red .card-cta{color:var(--red)}
+.card.blue .card-cta{color:#60A5FA}
+.card.gold .card-cta{color:var(--gold)}
+.arrow{font-size:1.1rem;transition:transform .2s}
+.card:hover .arrow{transform:translateX(5px)}
+
+/* ── Footer ── */
+footer{
+  text-align:center;padding:24px;
+  border-top:1px solid var(--border);
+  font-size:.72rem;color:rgba(255,255,255,.25);
+}
+footer strong{color:rgba(255,255,255,.4)}
+
+/* orb decorations */
+.orb{
+  position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0;
+}
+.orb1{width:400px;height:400px;background:rgba(217,35,45,.07);top:-100px;left:-100px}
+.orb2{width:350px;height:350px;background:rgba(37,99,235,.06);bottom:-80px;right:-80px}
+.orb3{width:300px;height:300px;background:rgba(201,162,39,.05);top:50%;right:20%}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<header>
+  <div class="logo">
+    <svg viewBox="0 0 120 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8 8L16 24L24 8" stroke="#D9232D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="30" y="22" font-family="Poppins,sans-serif" font-weight="700" font-size="16" fill="#ffffff">moglix</text>
+    </svg>
+    <div class="logo-divider"></div>
+    <span class="logo-text">Power BI Guide</span>
+  </div>
+  <div class="ar-pill">
+    <span class="ar-mono">AR</span>
+    <span>Analytics</span>
+  </div>
+</header>
+
+<main class="hero">
+  <div style="position:relative;z-index:1;width:100%;display:flex;flex-direction:column;align-items:center">
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      Interactive Self-Serve Guide
+    </div>
+    <h1>Moglix <span>Power BI</span><br>Report Guide</h1>
+    <p class="hero-sub">A persona-based interactive walkthrough to help you navigate, understand, and get the most out of Moglix Power BI reports — with built-in AI assistance.</p>
+
+    <p class="persona-label">Select your role to get started</p>
+
+    <div class="cards">
+      <!-- City Head -->
+      <div class="card red" onclick="goToGuide('city-head')">
+        <div class="card-icon">🏙️</div>
+        <div class="card-title">City Head</div>
+        <div class="card-role">Strategic Overview</div>
+        <div class="card-desc">High-level dashboards for city-wide P&amp;L, GMV tracking, and regional performance benchmarking.</div>
+        <div class="card-topics">
+          <span class="topic-tag">P&amp;L Summary</span>
+          <span class="topic-tag">GMV Trends</span>
+          <span class="topic-tag">Region View</span>
+          <span class="topic-tag">Weekly Report</span>
+        </div>
+        <div class="card-cta">
+          <span>Start Guide</span>
+          <span class="arrow">→</span>
+        </div>
+      </div>
+
+      <!-- SIC -->
+      <div class="card blue" onclick="goToGuide('sic')">
+        <div class="card-icon">📊</div>
+        <div class="card-title">SIC / AM</div>
+        <div class="card-role">Granular Self-Serve</div>
+        <div class="card-desc">Hands-on filtering, drill-through, period comparisons, and Excel export for day-to-day operational decisions.</div>
+        <div class="card-topics">
+          <span class="topic-tag">Filters &amp; Slicers</span>
+          <span class="topic-tag">Drill-Through</span>
+          <span class="topic-tag">Period Compare</span>
+          <span class="topic-tag">Excel Export</span>
+        </div>
+        <div class="card-cta">
+          <span>Start Guide</span>
+          <span class="arrow">→</span>
+        </div>
+      </div>
+
+      <!-- Analyst -->
+      <div class="card gold" onclick="goToGuide('analyst')">
+        <div class="card-icon">🔍</div>
+        <div class="card-title">Central Analyst</div>
+        <div class="card-role">Advanced &amp; Cross-Region</div>
+        <div class="card-desc">Data lineage, DAX logic, cross-region views, and advanced self-serve techniques for analytical deep-dives.</div>
+        <div class="card-topics">
+          <span class="topic-tag">DAX Logic</span>
+          <span class="topic-tag">Data Lineage</span>
+          <span class="topic-tag">All Regions</span>
+          <span class="topic-tag">Advanced Tips</span>
+        </div>
+        <div class="card-cta">
+          <span>Start Guide</span>
+          <span class="arrow">→</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  Built by <strong>Atul Rai</strong> · Moglix Analytics Lab · Power BI Self-Serve Initiative
+</footer>
+
+<script>
+function goToGuide(persona) {
+  window.location.href = `guide.html?persona=${persona}`;
+}
+// keyboard shortcut: 1=city-head, 2=sic, 3=analyst
+document.addEventListener('keydown', e => {
+  if(e.key==='1') goToGuide('city-head');
+  if(e.key==='2') goToGuide('sic');
+  if(e.key==='3') goToGuide('analyst');
+});
+</script>
+</body>
+</html>
