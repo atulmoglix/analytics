@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interest Calculator | Moglix</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23D9232D'/><text x='50%25' y='72%25' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold' font-size='22'>m</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --moglix-red:#D9232D;--moglix-dark:#333333;--moglix-bg:#F5F5F5;
+  --sidebar-bg:#1B2A3D;--sidebar-hover:#263B52;
+  --card-bg:#FFFFFF;--border:#E0E0E0;--text:#333333;--text-light:#888;
+  --green:#27AE60;--yellow:#F39C12;--orange:#E67E22;--red-light:#E74C3C;
+  --blue:#2563EB;--purple:#7C3AED;--teal:#0891B2;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',sans-serif;background:var(--moglix-bg);color:var(--text);display:flex;min-height:100vh}
+
+/* Sidebar */
+.sidebar{width:240px;background:var(--sidebar-bg);color:#fff;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100}
+.sidebar::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#C9A227,#E8D48B,#C9A227);z-index:1}
+.ar-credit{padding:12px 20px;border-top:1px solid rgba(201,162,39,.18);display:flex;align-items:center;gap:9px;text-decoration:none}
+.ar-monogram{width:26px;height:26px;background:#C9A227;border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:11px;font-weight:700;color:#0B1D3A;flex-shrink:0}
+.ar-credit-info .ar-name{font-size:11px;font-weight:600;color:rgba(255,255,255,.6)}
+.ar-credit-info .ar-tag{font-size:9px;color:#C9A227;letter-spacing:.8px;text-transform:uppercase;margin-top:1px}
+.sidebar-logo{padding:20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sidebar-logo .app-name{font-size:14px;font-weight:700;letter-spacing:.5px}
+.sidebar-logo .app-name span{display:block;font-size:10px;font-weight:400;opacity:.7;letter-spacing:0}
+.sidebar-logo .by-line{font-size:10px;color:var(--moglix-red);margin-top:2px}
+.sidebar nav{flex:1;padding:16px 0}
+.nav-section{padding:0 16px;margin-bottom:6px;font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.4);margin-top:16px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;color:rgba(255,255,255,.75);text-decoration:none;font-size:13px;transition:.2s;cursor:pointer;border-left:3px solid transparent}
+.nav-item:hover{background:var(--sidebar-hover);color:#fff}
+.nav-item.active{background:var(--sidebar-hover);color:#fff;border-left-color:var(--moglix-red)}
+
+.main{margin-left:240px;flex:1;padding:28px 32px;min-height:100vh}
+.page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+.page-header h1{font-size:22px;font-weight:700;color:var(--moglix-dark)}
+.page-header p{font-size:13px;color:var(--text-light);margin-top:2px}
+
+.card{background:var(--card-bg);border-radius:10px;border:1px solid var(--border);padding:24px;margin-bottom:20px}
+.card h2{font-size:15px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.card h2::before{content:'';width:3px;height:16px;background:var(--moglix-red);border-radius:2px}
+
+/* Selection Area */
+.select-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px}
+.select-group{display:flex;flex-direction:column;gap:5px}
+.select-group label{font-size:11px;font-weight:600;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px}
+.select-group select,.select-group input{padding:9px 12px;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px;background:#fff}
+.select-group select:focus,.select-group input:focus{outline:none;border-color:var(--moglix-red);box-shadow:0 0 0 3px rgba(217,35,45,.1)}
+
+/* Invoice detail card */
+.inv-detail{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.inv-stat{background:#F8F9FA;border-radius:8px;padding:14px 16px;border-left:3px solid var(--border)}
+.inv-stat.red{border-left-color:var(--moglix-red)}
+.inv-stat.green{border-left-color:var(--green)}
+.inv-stat.blue{border-left-color:var(--blue)}
+.inv-stat.orange{border-left-color:var(--orange)}
+.inv-stat .is-label{font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.inv-stat .is-value{font-size:20px;font-weight:700;margin-top:2px}
+.inv-stat .is-sub{font-size:11px;color:var(--text-light);margin-top:1px}
+
+/* What-if sliders */
+.whatif-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.whatif-card{background:#F8F9FA;border-radius:10px;padding:20px;border:1px solid #EEE}
+.whatif-card h3{font-size:13px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.whatif-card h3 .ai-badge{background:linear-gradient(135deg,#7C3AED,#EC4899);color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:.5px}
+
+.slider-group{margin-bottom:16px}
+.slider-group label{font-size:11px;font-weight:600;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;display:flex;justify-content:space-between;margin-bottom:6px}
+.slider-group label span{color:var(--moglix-red);font-size:14px;font-weight:700}
+.slider-group input[type=range]{width:100%;-webkit-appearance:none;height:6px;border-radius:3px;background:#DDD;outline:none}
+.slider-group input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--moglix-red);cursor:pointer;box-shadow:0 2px 6px rgba(217,35,45,.3)}
+
+/* Result display */
+.result-display{background:#fff;border-radius:10px;border:2px solid var(--moglix-red);padding:20px;margin-top:20px}
+.result-display h3{font-size:14px;font-weight:600;color:var(--moglix-red);margin-bottom:12px}
+.result-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px solid #F0F0F0}
+.result-row:last-child{border:none}
+.result-row .rr-label{color:var(--text-light)}
+.result-row .rr-value{font-weight:600}
+.result-row.total{font-size:16px;font-weight:700;padding-top:12px;margin-top:8px;border-top:2px solid var(--moglix-red);border-bottom:none}
+.result-row.total .rr-value{color:var(--moglix-red);font-size:18px}
+
+.result-row.savings .rr-value{color:var(--green)}
+
+/* Step-by-step calculation */
+.calc-steps{background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:16px;margin-top:16px}
+.calc-steps h4{font-size:12px;font-weight:600;color:#92400E;margin-bottom:10px}
+.calc-step{font-family:'Courier New',monospace;font-size:12px;padding:3px 0;color:#78350F}
+.calc-step.highlight{font-weight:700;color:var(--moglix-red)}
+
+/* Customer-level summary */
+.cust-calc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:16px}
+.cust-calc-card{background:#F8F9FA;border-radius:10px;padding:18px;border:1px solid #EEE;border-top:3px solid var(--moglix-red);transition:.2s}
+.cust-calc-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.cust-calc-card .cc-name{font-size:14px;font-weight:600}
+.cust-calc-card .cc-code{font-size:11px;color:var(--text-light)}
+.cust-calc-card .cc-row{display:flex;justify-content:space-between;font-size:12px;padding:4px 0}
+.cust-calc-card .cc-interest{font-size:22px;font-weight:800;color:var(--moglix-red);margin-top:8px}
+.cust-calc-card .cc-method{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;margin-top:4px}
+.method-a{background:#E3F2FD;color:#1565C0}
+.method-b{background:#F3E5F5;color:#7B1FA2}
+.method-c{background:#FFF3E0;color:#E65100}
+.method-d{background:#E8F5E9;color:#2E7D32}
+
+/* Tabs */
+.calc-tabs{display:flex;gap:4px;background:#F0F0F0;padding:4px;border-radius:8px;margin-bottom:20px;width:fit-content}
+.calc-tab{padding:8px 20px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;font-family:inherit;color:var(--text-light);transition:.2s}
+.calc-tab.active{background:#fff;color:var(--moglix-dark);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+
+.btn{padding:9px 20px;border:none;border-radius:6px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--moglix-red);color:#fff}
+.btn-primary:hover{background:#b91c25}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="30" height="30" viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="#D9232D"/><text x="50%" y="72%" text-anchor="middle" fill="white" font-family="Arial" font-weight="bold" font-size="22">m</text></svg>
+    <div>
+      <div class="app-name">INTEREST CALC <span>Delayed Payment Interest</span></div>
+      <div class="by-line">by Moglix</div>
+    </div>
+  </div>
+  <nav>
+    <div class="nav-section">Main</div>
+    <a class="nav-item" href="index.html">&#9881; Configuration</a>
+    <a class="nav-item" href="dashboard.html">&#9632; Dashboard</a>
+    <a class="nav-item active">&#9998; Calculator</a>
+  </nav>
+  <a class="ar-credit" href="#" title="Built by Atul Rai">
+    <div class="ar-monogram">AR</div>
+    <div class="ar-credit-info">
+      <div class="ar-name">Atul Rai</div>
+      <div class="ar-tag">Data &amp; Analytics</div>
+    </div>
+  </a>
+</aside>
+
+<div class="main">
+  <div class="page-header">
+    <div>
+      <h1>Interest Calculator</h1>
+      <p>Invoice-level interest computation with what-if analysis</p>
+    </div>
+  </div>
+
+  <!-- Mode tabs -->
+  <div class="calc-tabs">
+    <button class="calc-tab active" onclick="switchMode('invoice',this)">Single Invoice</button>
+    <button class="calc-tab" onclick="switchMode('customer',this)">Customer Summary</button>
+    <button class="calc-tab" onclick="switchMode('whatif',this)">What-If Analysis</button>
+  </div>
+
+  <!-- SINGLE INVOICE MODE -->
+  <div id="mode-invoice">
+    <div class="card">
+      <h2>Select Invoice</h2>
+      <div class="select-grid">
+        <div class="select-group">
+          <label>Customer</label>
+          <select id="selCust" onchange="filterPlants()"><option value="">-- All --</option></select>
+        </div>
+        <div class="select-group">
+          <label>Plant</label>
+          <select id="selPlant" onchange="filterInvoices()"><option value="">-- All --</option></select>
+        </div>
+        <div class="select-group">
+          <label>Invoice</label>
+          <select id="selInvoice" onchange="calcSingle()"><option value="">-- Select --</option></select>
+        </div>
+      </div>
+      <div class="select-grid" style="grid-template-columns:1fr 1fr">
+        <div class="select-group">
+          <label>As-of Date</label>
+          <input type="date" id="calcDate" onchange="calcSingle()">
+        </div>
+        <div class="select-group">
+          <label>Override Rate (% p.a.) &mdash; blank = use config</label>
+          <input type="number" id="overrideRate" step="0.1" min="0" placeholder="Auto from config" onchange="calcSingle()">
+        </div>
+      </div>
+    </div>
+
+    <div id="singleResult"></div>
+  </div>
+
+  <!-- CUSTOMER SUMMARY MODE -->
+  <div id="mode-customer" style="display:none">
+    <div class="card">
+      <h2>Customer-Level Interest Summary</h2>
+      <div class="select-grid" style="grid-template-columns:1fr 1fr">
+        <div class="select-group">
+          <label>As-of Date</label>
+          <input type="date" id="custCalcDate" onchange="calcCustomerSummary()">
+        </div>
+        <div class="select-group">
+          <label>Filter Region</label>
+          <select id="custRegion" onchange="calcCustomerSummary()">
+            <option value="">All Regions</option>
+            <option>North</option><option>South</option><option>East</option><option>West</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div id="custSummaryResult"></div>
+  </div>
+
+  <!-- WHAT-IF MODE -->
+  <div id="mode-whatif" style="display:none">
+    <div class="card">
+      <h2>What-If Scenario Builder</h2>
+      <div class="select-grid">
+        <div class="select-group">
+          <label>Customer</label>
+          <select id="wifCust" onchange="calcWhatIf()"><option value="">All Customers</option></select>
+        </div>
+        <div class="select-group">
+          <label>Base Date</label>
+          <input type="date" id="wifDate" onchange="calcWhatIf()">
+        </div>
+        <div class="select-group">
+          <label>&nbsp;</label>
+          <button class="btn btn-primary" onclick="calcWhatIf()">Calculate</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="whatif-grid">
+      <!-- Payment slider -->
+      <div class="whatif-card">
+        <h3>Payment Scenario <span class="ai-badge">AI</span></h3>
+        <div class="slider-group">
+          <label>If customer pays <span id="payAmtLabel">\u20B90</span></label>
+          <input type="range" id="paySlider" min="0" max="100" value="0" oninput="calcWhatIf()">
+        </div>
+        <p style="font-size:11px;color:var(--text-light)">Slide to simulate partial payment. Applied proportionally across all overdue invoices (oldest first).</p>
+        <div id="payResult"></div>
+      </div>
+
+      <!-- Time projection -->
+      <div class="whatif-card">
+        <h3>Time Projection <span class="ai-badge">AI</span></h3>
+        <div class="slider-group">
+          <label>If no payment for <span id="daysLabel">0 days</span></label>
+          <input type="range" id="daysSlider" min="0" max="180" value="0" oninput="calcWhatIf()">
+        </div>
+        <p style="font-size:11px;color:var(--text-light)">Project interest accrual forward. See how delay impacts total interest.</p>
+        <div id="timeResult"></div>
+      </div>
+
+      <!-- Rate change -->
+      <div class="whatif-card">
+        <h3>Rate Change Impact</h3>
+        <div class="slider-group">
+          <label>Apply uniform rate of <span id="rateLabel">12%</span> p.a.</label>
+          <input type="range" id="rateSlider" min="0" max="36" value="12" step="0.5" oninput="calcWhatIf()">
+        </div>
+        <p style="font-size:11px;color:var(--text-light)">Override all customer configs with a single rate to compare impact.</p>
+        <div id="rateResult"></div>
+      </div>
+
+      <!-- Combined result -->
+      <div class="whatif-card" style="border:2px solid var(--moglix-red)">
+        <h3>Scenario Summary</h3>
+        <div id="scenarioSummary"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ===== DATA ===== */
+const SK = {configs:'idp_configs',customers:'idp_customers',plants:'idp_plants',invoices:'idp_invoices'};
+function load(k){try{return JSON.parse(localStorage.getItem(k))||[]}catch(e){return[]}}
+
+let customers=load(SK.customers);
+let plants=load(SK.plants);
+let invoices=load(SK.invoices);
+let configs=load(SK.configs);
+let teams=JSON.parse(localStorage.getItem('idp_teams'))||[];
+
+if(!customers.length){
+  if(confirm('No data found. Go to Configuration to seed data?')) window.location='index.html';
+}
+
+function getCust(id){return customers.find(c=>c.id===id)}
+function getPlant(id){return plants.find(p=>p.id===id)}
+function getTeam(id){return teams.find(t=>t.id===id)}
+
+function formatINR(amt){
+  if(amt<0)amt=0;
+  if(amt>=10000000)return'\u20B9'+(amt/10000000).toFixed(2)+'Cr';
+  if(amt>=100000)return'\u20B9'+(amt/100000).toFixed(1)+'L';
+  return'\u20B9'+Math.round(amt).toLocaleString('en-IN');
+}
+
+function getDueDate(inv){
+  const d=new Date(inv.invoiceDate);d.setDate(d.getDate()+inv.creditDays);
+  return d.toISOString().split('T')[0];
+}
+
+function getOverdueDays(inv,asOf){
+  const due=getDueDate(inv);
+  const ref=asOf||new Date().toISOString().split('T')[0];
+  return Math.max(0,Math.floor((new Date(ref)-new Date(due))/86400000));
+}
+
+function getApplicableConfig(custId){
+  const active=configs.filter(c=>c.active);
+  return active.find(c=>c.customerId===custId)||active.find(c=>c.customerId==='ALL')||{method:'A',rate:12,graceDays:0,slabs:[]};
+}
+
+const methodNames={A:'Simple Daily',B:'Month-End',C:'Compounding',D:'Slab/Tiered'};
+
+function calcInterest(inv,cfg,asOf){
+  const od=getOverdueDays(inv,asOf);
+  const ed=Math.max(0,od-(cfg.graceDays||0));
+  if(ed<=0)return{interest:0,days:od,effectiveDays:0,steps:['Within credit period or grace period \u2014 no interest']};
+  const b=inv.balance;
+  let interest=0,steps=[];
+
+  steps.push(`Balance: ${formatINR(b)}`);
+  steps.push(`Overdue: ${od} days - ${cfg.graceDays||0} grace = ${ed} chargeable days`);
+  steps.push(`Method: ${cfg.method} \u2014 ${methodNames[cfg.method]}`);
+
+  switch(cfg.method){
+    case'A':
+      interest=b*(cfg.rate/100/365)*ed;
+      steps.push(`Rate: ${cfg.rate}% p.a. = ${(cfg.rate/365).toFixed(4)}% per day`);
+      steps.push(`= ${formatINR(b)} \u00D7 ${cfg.rate}%/365 \u00D7 ${ed}`);
+      steps.push(`= ${formatINR(Math.round(interest))}`);
+      break;
+    case'B':{
+      const m=Math.floor(ed/30);
+      interest=b*(cfg.rate/100/12)*m;
+      steps.push(`Rate: ${cfg.rate}% p.a. = ${(cfg.rate/12).toFixed(2)}% per month`);
+      steps.push(`${ed} days = ${m} full months`);
+      steps.push(`= ${formatINR(b)} \u00D7 ${cfg.rate}%/12 \u00D7 ${m}`);
+      steps.push(`= ${formatINR(Math.round(interest))}`);
+      break;}
+    case'C':{
+      const m=Math.floor(ed/30);
+      let p=b,t=0;
+      for(let i=1;i<=m;i++){
+        const mi=p*(cfg.rate/100/12);
+        t+=mi;
+        steps.push(`Month ${i}: ${formatINR(Math.round(p))} \u00D7 ${(cfg.rate/12).toFixed(2)}% = ${formatINR(Math.round(mi))}`);
+        p+=mi;
+      }
+      interest=t;
+      steps.push(`Total compounded = ${formatINR(Math.round(interest))}`);
+      break;}
+    case'D':{
+      (cfg.slabs||[]).forEach(s=>{
+        const d=Math.max(0,Math.min(ed,s.maxDays)-s.minDays);
+        if(d>0&&s.rate>0){
+          const si=b*(s.rate/100/365)*d;
+          interest+=si;
+          steps.push(`Days ${s.minDays}\u2013${Math.min(s.maxDays,ed)}: ${d}d @ ${s.rate}% = ${formatINR(Math.round(si))}`);
+        } else if(d>0){
+          steps.push(`Days ${s.minDays}\u2013${Math.min(s.maxDays,ed)}: ${d}d @ 0% (free)`);
+        }
+      });
+      steps.push(`Total slab interest = ${formatINR(Math.round(interest))}`);
+      break;}
+  }
+  return{interest:Math.round(interest),days:od,effectiveDays:ed,steps};
+}
+
+function calcInterestSimple(inv,cfg,asOf){
+  const r=calcInterest(inv,cfg,asOf);return r.interest;
+}
+
+/* ===== MODE SWITCHING ===== */
+function switchMode(mode,btn){
+  ['invoice','customer','whatif'].forEach(m=>{
+    document.getElementById('mode-'+m).style.display=m===mode?'':'none';
+  });
+  btn.parentElement.querySelectorAll('.calc-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  if(mode==='customer')calcCustomerSummary();
+}
+
+/* ===== INIT DROPDOWNS ===== */
+const today=new Date().toISOString().split('T')[0];
+document.getElementById('calcDate').value=today;
+document.getElementById('custCalcDate').value=today;
+document.getElementById('wifDate').value=today;
+
+// Customer dropdowns
+['selCust','wifCust'].forEach(id=>{
+  const sel=document.getElementById(id);
+  customers.forEach(c=>{sel.innerHTML+=`<option value="${c.id}">${c.name} (${c.code})</option>`});
+});
+
+function filterPlants(){
+  const custId=document.getElementById('selCust').value;
+  const sel=document.getElementById('selPlant');
+  sel.innerHTML='<option value="">-- All --</option>';
+  const filtered=custId?plants.filter(p=>p.customerId===custId):plants;
+  filtered.forEach(p=>{
+    const t=getTeam(p.teamId);
+    sel.innerHTML+=`<option value="${p.id}">${p.name} (${t?.region||''})</option>`;
+  });
+  filterInvoices();
+}
+
+function filterInvoices(){
+  const custId=document.getElementById('selCust').value;
+  const plantId=document.getElementById('selPlant').value;
+  const sel=document.getElementById('selInvoice');
+  sel.innerHTML='<option value="">-- Select --</option>';
+  let filtered=[...invoices];
+  if(custId)filtered=filtered.filter(i=>i.customerId===custId);
+  if(plantId)filtered=filtered.filter(i=>i.plantId===plantId);
+  filtered.sort((a,b)=>b.balance-a.balance);
+  filtered.slice(0,100).forEach(inv=>{
+    const p=getPlant(inv.plantId);
+    sel.innerHTML+=`<option value="${inv.id}">${inv.id} | ${p?.name||''} | Bal: ${formatINR(inv.balance)}</option>`;
+  });
+}
+
+// Populate initially
+filterPlants();
+
+/* ===== SINGLE INVOICE CALC ===== */
+function calcSingle(){
+  const invId=document.getElementById('selInvoice').value;
+  if(!invId){document.getElementById('singleResult').innerHTML='';return;}
+
+  const inv=invoices.find(i=>i.id===invId);
+  const asOf=document.getElementById('calcDate').value;
+  const overrideRate=document.getElementById('overrideRate').value;
+
+  let cfg=getApplicableConfig(inv.customerId);
+  if(overrideRate){
+    cfg={...cfg,method:'A',rate:parseFloat(overrideRate)};
+  }
+
+  const result=calcInterest(inv,cfg,asOf);
+  const plant=getPlant(inv.plantId);
+  const cust=getCust(inv.customerId);
+  const team=getTeam(plant?.teamId);
+  const dueDate=getDueDate(inv);
+
+  const agingColor=result.days<=30?'var(--green)':result.days<=60?'var(--yellow)':result.days<=90?'var(--orange)':'var(--red-light)';
+
+  document.getElementById('singleResult').innerHTML=`
+    <div class="card" style="margin-top:0">
+      <h2>Invoice ${inv.id}</h2>
+      <div style="font-size:13px;color:var(--text-light);margin-bottom:16px">
+        ${cust?.name} | ${plant?.name} | ${team?.region} / ${team?.name} | ${plant?.city}
+      </div>
+
+      <div class="inv-detail">
+        <div class="inv-stat blue">
+          <div class="is-label">Invoice Amount</div>
+          <div class="is-value">${formatINR(inv.amount)}</div>
+          <div class="is-sub">${inv.invoiceDate} | Cr: ${inv.creditDays}d</div>
+        </div>
+        <div class="inv-stat orange">
+          <div class="is-label">Outstanding Balance</div>
+          <div class="is-value">${formatINR(inv.balance)}</div>
+          <div class="is-sub">Due: ${dueDate}</div>
+        </div>
+        <div class="inv-stat" style="border-left-color:${agingColor}">
+          <div class="is-label">Overdue Days</div>
+          <div class="is-value" style="color:${agingColor}">${result.days}d</div>
+          <div class="is-sub">Chargeable: ${result.effectiveDays}d</div>
+        </div>
+        <div class="inv-stat red">
+          <div class="is-label">Interest Accrued</div>
+          <div class="is-value" style="color:var(--moglix-red)">${formatINR(result.interest)}</div>
+          <div class="is-sub">Method ${cfg.method} @ ${cfg.method==='D'?'Slab':cfg.rate+'%'} p.a.</div>
+        </div>
+      </div>
+
+      <div class="calc-steps">
+        <h4>Step-by-Step Calculation</h4>
+        ${result.steps.map((s,i)=>`<div class="calc-step ${i===result.steps.length-1?'highlight':''}">${s}</div>`).join('')}
+      </div>
+    </div>
+  `;
+}
+
+/* ===== CUSTOMER SUMMARY ===== */
+function calcCustomerSummary(){
+  const asOf=document.getElementById('custCalcDate').value;
+  const region=document.getElementById('custRegion').value;
+
+  let html='<div class="cust-calc-grid">';
+  customers.forEach(c=>{
+    const cfg=getApplicableConfig(c.id);
+    let custInvs=invoices.filter(i=>i.customerId===c.id);
+    if(region){
+      const rPlants=new Set(plants.filter(p=>{const t=getTeam(p.teamId);return t&&t.region===region}).map(p=>p.id));
+      custInvs=custInvs.filter(i=>rPlants.has(i.plantId));
+    }
+    const totalBal=custInvs.reduce((s,i)=>s+i.balance,0);
+    const totalInt=custInvs.reduce((s,i)=>s+calcInterestSimple(i,cfg,asOf),0);
+    const overdueCount=custInvs.filter(i=>getOverdueDays(i,asOf)>0).length;
+    const avgOverdue=custInvs.length?Math.round(custInvs.reduce((s,i)=>s+getOverdueDays(i,asOf),0)/custInvs.length):0;
+
+    html+=`<div class="cust-calc-card">
+      <div class="cc-name">${c.name}</div>
+      <div class="cc-code">${c.code} | Method ${cfg.method}</div>
+      <span class="cc-method method-${cfg.method.toLowerCase()}">${cfg.method}: ${methodNames[cfg.method]}</span>
+      <div class="cc-interest">${formatINR(Math.round(totalInt))}</div>
+      <div style="margin-top:10px">
+        <div class="cc-row"><span style="color:var(--text-light)">Outstanding</span><strong>${formatINR(totalBal)}</strong></div>
+        <div class="cc-row"><span style="color:var(--text-light)">Open Invoices</span><strong>${custInvs.length}</strong></div>
+        <div class="cc-row"><span style="color:var(--text-light)">Overdue</span><strong>${overdueCount}</strong></div>
+        <div class="cc-row"><span style="color:var(--text-light)">Avg Overdue</span><strong>${avgOverdue}d</strong></div>
+        <div class="cc-row"><span style="color:var(--text-light)">Rate</span><strong>${cfg.method==='D'?'Slab':cfg.rate+'% p.a.'}</strong></div>
+      </div>
+    </div>`;
+  });
+  html+='</div>';
+  document.getElementById('custSummaryResult').innerHTML=html;
+}
+
+/* ===== WHAT-IF ===== */
+function calcWhatIf(){
+  const custFilter=document.getElementById('wifCust').value;
+  const baseDate=document.getElementById('wifDate').value;
+  const payPct=parseInt(document.getElementById('paySlider').value);
+  const extraDays=parseInt(document.getElementById('daysSlider').value);
+  const uniformRate=parseFloat(document.getElementById('rateSlider').value);
+
+  let filtered=custFilter?invoices.filter(i=>i.customerId===custFilter):[...invoices];
+  const totalBal=filtered.reduce((s,i)=>s+i.balance,0);
+  const payAmt=Math.round(totalBal*payPct/100);
+
+  // Update labels
+  document.getElementById('payAmtLabel').textContent=formatINR(payAmt);
+  document.getElementById('daysLabel').textContent=extraDays===0?'0 days':extraDays+' days';
+  document.getElementById('rateLabel').textContent=uniformRate+'%';
+
+  // Baseline interest (today, no payment, actual configs)
+  const baselineInt=filtered.reduce((s,inv)=>{
+    const cfg=getApplicableConfig(inv.customerId);
+    return s+calcInterestSimple(inv,cfg,baseDate);
+  },0);
+
+  // 1. Payment scenario: reduce balances proportionally (oldest first)
+  let payRemaining=payAmt;
+  const sortedByOverdue=[...filtered].sort((a,b)=>getOverdueDays(b,baseDate)-getOverdueDays(a,baseDate));
+  const afterPayInvs=sortedByOverdue.map(inv=>{
+    const deduction=Math.min(inv.balance,payRemaining);
+    payRemaining-=deduction;
+    return{...inv,balance:inv.balance-deduction};
+  });
+  const payInt=afterPayInvs.reduce((s,inv)=>{
+    const cfg=getApplicableConfig(inv.customerId);
+    return s+calcInterestSimple(inv,cfg,baseDate);
+  },0);
+  const paySavings=baselineInt-payInt;
+
+  document.getElementById('payResult').innerHTML=`
+    <div class="result-display" style="border-color:var(--green);margin-top:12px">
+      <div class="result-row"><span class="rr-label">Payment Amount</span><span class="rr-value">${formatINR(payAmt)}</span></div>
+      <div class="result-row"><span class="rr-label">Interest After Payment</span><span class="rr-value">${formatINR(Math.round(payInt))}</span></div>
+      <div class="result-row savings"><span class="rr-label">Interest Saved</span><span class="rr-value" style="color:var(--green)">\u2193 ${formatINR(Math.round(paySavings))}</span></div>
+    </div>`;
+
+  // 2. Time projection
+  const futureDate=(()=>{const d=new Date(baseDate);d.setDate(d.getDate()+extraDays);return d.toISOString().split('T')[0]})();
+  const futureInt=filtered.reduce((s,inv)=>{
+    const cfg=getApplicableConfig(inv.customerId);
+    return s+calcInterestSimple(inv,cfg,futureDate);
+  },0);
+  const timeIncrease=futureInt-baselineInt;
+
+  document.getElementById('timeResult').innerHTML=`
+    <div class="result-display" style="border-color:var(--orange);margin-top:12px">
+      <div class="result-row"><span class="rr-label">Interest on ${futureDate}</span><span class="rr-value">${formatINR(Math.round(futureInt))}</span></div>
+      <div class="result-row"><span class="rr-label">Additional Interest</span><span class="rr-value" style="color:var(--orange)">\u2191 ${formatINR(Math.round(timeIncrease))}</span></div>
+      <div class="result-row"><span class="rr-label">Daily Burn Rate</span><span class="rr-value" style="color:var(--red-light)">${extraDays?formatINR(Math.round(timeIncrease/extraDays)):'\u20B90'}/day</span></div>
+    </div>`;
+
+  // 3. Rate change
+  const uniformCfg={method:'A',rate:uniformRate,graceDays:0,slabs:[]};
+  const rateInt=filtered.reduce((s,inv)=>s+calcInterestSimple(inv,uniformCfg,baseDate),0);
+  const rateDiff=rateInt-baselineInt;
+
+  document.getElementById('rateResult').innerHTML=`
+    <div class="result-display" style="border-color:var(--purple);margin-top:12px">
+      <div class="result-row"><span class="rr-label">Interest @ ${uniformRate}%</span><span class="rr-value">${formatINR(Math.round(rateInt))}</span></div>
+      <div class="result-row"><span class="rr-label">vs Current Config</span><span class="rr-value" style="color:${rateDiff>0?'var(--red-light)':'var(--green)'};">${rateDiff>0?'\u2191':'\u2193'} ${formatINR(Math.abs(Math.round(rateDiff)))}</span></div>
+    </div>`;
+
+  // 4. Combined scenario summary
+  document.getElementById('scenarioSummary').innerHTML=`
+    <div class="result-display" style="border-width:1px;margin-top:0">
+      <div class="result-row"><span class="rr-label">Baseline Interest (Today)</span><span class="rr-value">${formatINR(Math.round(baselineInt))}</span></div>
+      <div class="result-row"><span class="rr-label">Total Outstanding</span><span class="rr-value">${formatINR(totalBal)}</span></div>
+      <hr style="border:none;border-top:1px solid #eee;margin:8px 0">
+      <div class="result-row"><span class="rr-label">If ${formatINR(payAmt)} is paid now</span><span class="rr-value savings" style="color:var(--green)">\u2193 ${formatINR(Math.round(paySavings))} saved</span></div>
+      <div class="result-row"><span class="rr-label">If unpaid for ${extraDays} more days</span><span class="rr-value" style="color:var(--orange)">\u2191 ${formatINR(Math.round(timeIncrease))} more</span></div>
+      <div class="result-row total"><span class="rr-label">Projected Total</span><span class="rr-value">${formatINR(Math.round(futureInt))}</span></div>
+    </div>
+    <p style="font-size:11px;color:var(--text-light);margin-top:12px;line-height:1.6">
+      <strong>AI Recommendation:</strong> ${payPct>0?`Paying ${formatINR(payAmt)} now saves ${formatINR(Math.round(paySavings))} in interest.`:''}
+      ${extraDays>0?`Every day of delay costs ~${formatINR(Math.round(timeIncrease/(extraDays||1)))}.`:''}
+      ${payPct===0&&extraDays===0?'Use the sliders above to model payment or delay scenarios.':''}
+      ${paySavings>timeIncrease&&payPct>0?'Payment ROI is positive \u2014 paying now is strongly recommended.':''}
+    </p>
+  `;
+}
+
+// Init what-if
+calcWhatIf();
+calcCustomerSummary();
+</script>
+</body>
+</html>

@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interest on Delayed Payments | Moglix</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23D9232D'/><text x='50%25' y='72%25' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold' font-size='22'>m</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --moglix-red:#D9232D;--moglix-dark:#333333;--moglix-bg:#F5F5F5;
+  --sidebar-bg:#1B2A3D;--sidebar-hover:#263B52;--sidebar-active:#D9232D;
+  --card-bg:#FFFFFF;--border:#E0E0E0;--text:#333333;--text-light:#888;
+  --green:#27AE60;--yellow:#F39C12;--orange:#E67E22;--red-light:#E74C3C;
+  --blue:#2563EB;--purple:#7C3AED;--teal:#0891B2;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',sans-serif;background:var(--moglix-bg);color:var(--text);display:flex;min-height:100vh}
+
+/* Sidebar */
+.sidebar{width:240px;background:var(--sidebar-bg);color:#fff;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100}
+.sidebar::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#C9A227,#E8D48B,#C9A227);z-index:1}
+.ar-credit{padding:12px 20px;border-top:1px solid rgba(201,162,39,.18);display:flex;align-items:center;gap:9px;text-decoration:none}
+.ar-monogram{width:26px;height:26px;background:#C9A227;border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:11px;font-weight:700;color:#0B1D3A;flex-shrink:0}
+.ar-credit-info .ar-name{font-size:11px;font-weight:600;color:rgba(255,255,255,.6)}
+.ar-credit-info .ar-tag{font-size:9px;color:#C9A227;letter-spacing:.8px;text-transform:uppercase;margin-top:1px}
+.sidebar-logo{padding:20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sidebar-logo img{height:28px}
+.sidebar-logo .app-name{font-size:14px;font-weight:700;letter-spacing:.5px}
+.sidebar-logo .app-name span{display:block;font-size:10px;font-weight:400;opacity:.7;letter-spacing:0}
+.sidebar-logo .by-line{font-size:10px;color:var(--moglix-red);margin-top:2px}
+.sidebar nav{flex:1;padding:16px 0}
+.nav-section{padding:0 16px;margin-bottom:6px;font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.4);margin-top:16px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;color:rgba(255,255,255,.75);text-decoration:none;font-size:13px;transition:.2s;cursor:pointer;border-left:3px solid transparent}
+.nav-item:hover{background:var(--sidebar-hover);color:#fff}
+.nav-item.active{background:var(--sidebar-hover);color:#fff;border-left-color:var(--moglix-red)}
+
+/* Main */
+.main{margin-left:240px;flex:1;padding:28px 32px;min-height:100vh}
+.page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+.page-header h1{font-size:22px;font-weight:700;color:var(--moglix-dark)}
+.page-header p{font-size:13px;color:var(--text-light);margin-top:2px}
+
+/* Buttons */
+.btn{padding:9px 20px;border:none;border-radius:6px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--moglix-red);color:#fff}
+.btn-primary:hover{background:#b91c25}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--moglix-red);color:var(--moglix-red)}
+.btn-sm{padding:6px 14px;font-size:12px}
+.btn-danger{background:#fee;color:var(--red-light);border:1px solid #fcc}
+.btn-danger:hover{background:var(--red-light);color:#fff}
+.btn-success{background:#E8F5E9;color:var(--green);border:1px solid #C8E6C9}
+
+/* Cards */
+.card{background:var(--card-bg);border-radius:10px;border:1px solid var(--border);padding:24px;margin-bottom:20px}
+.card h2{font-size:16px;font-weight:600;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--moglix-red);display:inline-block}
+
+/* Table */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:10px 14px;background:#F8F8F8;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-light);border-bottom:2px solid var(--border)}
+td{padding:10px 14px;border-bottom:1px solid #F0F0F0;vertical-align:middle}
+tr:hover td{background:#FAFAFA}
+
+/* Badges */
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-a{background:#E3F2FD;color:#1565C0}
+.badge-b{background:#F3E5F5;color:#7B1FA2}
+.badge-c{background:#FFF3E0;color:#E65100}
+.badge-d{background:#E8F5E9;color:#2E7D32}
+
+/* Form */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group.full{grid-column:1/-1}
+.form-group label{font-size:12px;font-weight:600;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px}
+.form-group input,.form-group select,.form-group textarea{padding:9px 12px;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px;transition:.2s;background:#fff}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--moglix-red);box-shadow:0 0 0 3px rgba(217,35,45,.1)}
+
+/* Slab table */
+.slab-table{margin-top:8px}
+.slab-row{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+.slab-row input{width:80px;padding:6px 8px;border:1.5px solid var(--border);border-radius:4px;font-size:12px;font-family:inherit}
+.slab-row .slab-label{font-size:11px;color:var(--text-light);min-width:20px;text-align:center}
+.slab-row button{background:none;border:none;color:var(--red-light);cursor:pointer;font-size:16px}
+.add-slab-btn{font-size:12px;color:var(--blue);cursor:pointer;border:none;background:none;font-family:inherit;font-weight:500;margin-top:4px}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;justify-content:center;align-items:center}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:12px;width:680px;max-height:85vh;overflow-y:auto;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal h2{font-size:18px;font-weight:700;margin-bottom:20px;color:var(--moglix-dark)}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;padding-top:16px;border-top:1px solid var(--border)}
+
+/* Test Result */
+.test-result{background:#F8F9FA;border:1px solid var(--border);border-radius:8px;padding:16px;margin-top:16px;font-size:13px}
+.test-result h3{font-size:14px;margin-bottom:10px;color:var(--moglix-dark)}
+.test-result .calc-step{padding:4px 0;color:#555;font-family:'Courier New',monospace;font-size:12px}
+.test-result .calc-total{font-size:16px;font-weight:700;color:var(--moglix-red);margin-top:8px}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--moglix-dark);color:#fff;padding:12px 24px;border-radius:8px;font-size:13px;z-index:999;opacity:0;transform:translateY(20px);transition:.3s}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* View toggle */
+.view-tabs{display:flex;gap:4px;background:#F0F0F0;padding:4px;border-radius:8px}
+.view-tab{padding:7px 18px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:none;font-family:inherit;color:var(--text-light);transition:.2s}
+.view-tab.active{background:#fff;color:var(--moglix-dark);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+
+/* Responsive */
+@media(max-width:1024px){.sidebar{width:200px}.main{margin-left:200px}.form-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="30" height="30" viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="#D9232D"/><text x="50%" y="72%" text-anchor="middle" fill="white" font-family="Arial" font-weight="bold" font-size="22">m</text></svg>
+    <div>
+      <div class="app-name">INTEREST CALC <span>Delayed Payment Interest</span></div>
+      <div class="by-line">by Moglix</div>
+    </div>
+  </div>
+  <nav>
+    <div class="nav-section">Main</div>
+    <a class="nav-item active" onclick="showView('config')">&#9881; Configuration</a>
+    <a class="nav-item" href="dashboard.html">&#9632; Dashboard</a>
+    <a class="nav-item" href="calculator.html">&#9998; Calculator</a>
+    <div class="nav-section">Data</div>
+    <a class="nav-item" onclick="showView('customers')">&#9679; Customers &amp; Plants</a>
+    <a class="nav-item" onclick="showView('invoices')">&#9830; Invoices (Fact AR)</a>
+  </nav>
+  <a class="ar-credit" href="#" title="Built by Atul Rai">
+    <div class="ar-monogram">AR</div>
+    <div class="ar-credit-info">
+      <div class="ar-name">Atul Rai</div>
+      <div class="ar-tag">Data &amp; Analytics</div>
+    </div>
+  </a>
+</aside>
+
+<!-- Main Content -->
+<div class="main">
+
+  <!-- CONFIG VIEW -->
+  <div id="view-config">
+    <div class="page-header">
+      <div>
+        <h1>Interest Configuration</h1>
+        <p>Manage interest rules per customer &mdash; rates, methods, and slab brackets</p>
+      </div>
+      <button class="btn btn-primary" onclick="openConfigModal()">+ New Rule</button>
+    </div>
+    <div class="card">
+      <div class="tbl-wrap">
+        <table id="configTable">
+          <thead>
+            <tr><th>Customer</th><th>Method</th><th>Rate / Slabs</th><th>Grace Days</th><th>Effective Period</th><th>Status</th><th style="width:120px">Actions</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOMERS VIEW -->
+  <div id="view-customers" style="display:none">
+    <div class="page-header">
+      <div>
+        <h1>Customers &amp; Plants (DSP)</h1>
+        <p>Master data &mdash; 5 customers, plants tagged to sales teams and regions</p>
+      </div>
+      <div class="view-tabs">
+        <button class="view-tab active" onclick="showCustView('summary',this)">Summary</button>
+        <button class="view-tab" onclick="showCustView('detail',this)">All Plants</button>
+      </div>
+    </div>
+    <div id="cust-summary"></div>
+    <div id="cust-detail" style="display:none"></div>
+  </div>
+
+  <!-- INVOICES VIEW -->
+  <div id="view-invoices" style="display:none">
+    <div class="page-header">
+      <div>
+        <h1>Fact AR &mdash; Open Invoices</h1>
+        <p>All invoices with outstanding balance &gt; 0</p>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <select id="invFilterCust" onchange="renderInvoices()" style="padding:7px 12px;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:12px">
+          <option value="">All Customers</option>
+        </select>
+        <select id="invFilterAging" onchange="renderInvoices()" style="padding:7px 12px;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:12px">
+          <option value="">All Aging</option>
+          <option value="current">Current (0-30d)</option>
+          <option value="overdue30">31-60 days</option>
+          <option value="overdue60">61-90 days</option>
+          <option value="overdue90">90+ days</option>
+        </select>
+      </div>
+    </div>
+    <div class="card">
+      <div class="tbl-wrap">
+        <table id="invoiceTable">
+          <thead>
+            <tr><th>Invoice</th><th>Plant</th><th>Customer</th><th>Invoice Date</th><th>Amount</th><th>Balance</th><th>Credit Days</th><th>Due Date</th><th>Overdue</th><th>Aging</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Config Modal -->
+<div class="modal-overlay" id="configModal">
+  <div class="modal">
+    <h2 id="configModalTitle">New Interest Rule</h2>
+    <input type="hidden" id="cfgEditId">
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Customer</label>
+        <select id="cfgCustomer">
+          <option value="ALL">ALL Customers (Default)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Calculation Method</label>
+        <select id="cfgMethod" onchange="toggleSlabs()">
+          <option value="A">A &mdash; Simple Daily</option>
+          <option value="B">B &mdash; Month-End</option>
+          <option value="C">C &mdash; Compounding (Monthly)</option>
+          <option value="D">D &mdash; Slab / Tiered</option>
+        </select>
+      </div>
+      <div class="form-group" id="rateGroup">
+        <label>Interest Rate (% p.a.)</label>
+        <input type="number" id="cfgRate" step="0.1" min="0" max="100" value="12">
+      </div>
+      <div class="form-group">
+        <label>Grace Days (before interest starts)</label>
+        <input type="number" id="cfgGrace" min="0" value="0">
+      </div>
+      <div class="form-group">
+        <label>Effective From</label>
+        <input type="date" id="cfgFrom" value="2025-01-01">
+      </div>
+      <div class="form-group">
+        <label>Effective To (blank = ongoing)</label>
+        <input type="date" id="cfgTo">
+      </div>
+      <div class="form-group full" id="slabGroup" style="display:none">
+        <label>Slab Brackets</label>
+        <div id="slabRows"></div>
+        <button class="add-slab-btn" onclick="addSlabRow()">+ Add Bracket</button>
+      </div>
+    </div>
+
+    <!-- Test Calculation -->
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <label style="font-size:12px;font-weight:600;color:var(--text-light)">TEST CALCULATION</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select id="testInvoice" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:4px;font-size:12px;font-family:inherit;width:280px"></select>
+          <button class="btn btn-sm btn-outline" onclick="runTest()">Run Test</button>
+        </div>
+      </div>
+      <div id="testResult"></div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeConfigModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveConfig()">Save Rule</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== STORAGE ===== */
+const SK = {
+  configs: 'idp_configs',
+  customers: 'idp_customers',
+  plants: 'idp_plants',
+  invoices: 'idp_invoices'
+};
+
+function load(k){ try{ return JSON.parse(localStorage.getItem(k)) || null; }catch(e){ return null; }}
+function save(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
+
+/* ===== SEED DATA ===== */
+function seedIfNeeded(){
+  if(load(SK.customers)) return;
+
+  // Customers
+  const customers = [
+    {id:'CUST-01', name:'Tata Steel', code:'TATA'},
+    {id:'CUST-02', name:'Larsen & Toubro', code:'LNT'},
+    {id:'CUST-03', name:'Hindustan Unilever', code:'HUL'},
+    {id:'CUST-04', name:'Maruti Suzuki', code:'MSIL'},
+    {id:'CUST-05', name:'Reliance Industries', code:'RIL'}
+  ];
+
+  // Regions & Teams
+  const regions = ['North','South','East','West'];
+  const teams = [];
+  regions.forEach(r=>{
+    for(let i=1;i<=3;i++) teams.push({id:`${r.substring(0,1)}${i}`, name:`${r}-${i}`, region:r});
+  });
+
+  // Plants (50 plants spread across customers)
+  const plantData = [
+    // Tata Steel (12 plants)
+    {name:'Jamshedpur Works',cust:'CUST-01',team:'E1',city:'Jamshedpur'},
+    {name:'Kalinganagar Plant',cust:'CUST-01',team:'E2',city:'Kalinganagar'},
+    {name:'Meramandali Unit',cust:'CUST-01',team:'E3',city:'Meramandali'},
+    {name:'Sahibabad Depot',cust:'CUST-01',team:'N1',city:'Sahibabad'},
+    {name:'Khopoli Plant',cust:'CUST-01',team:'W1',city:'Khopoli'},
+    {name:'Bara Plant',cust:'CUST-01',team:'E1',city:'Bara'},
+    {name:'Boisar Unit',cust:'CUST-01',team:'W2',city:'Boisar'},
+    {name:'Haldia Unit',cust:'CUST-01',team:'E2',city:'Haldia'},
+    {name:'Chennai Depot',cust:'CUST-01',team:'S1',city:'Chennai'},
+    {name:'Bengaluru Depot',cust:'CUST-01',team:'S2',city:'Bengaluru'},
+    {name:'Noamundi Mine',cust:'CUST-01',team:'E3',city:'Noamundi'},
+    {name:'Lucknow Depot',cust:'CUST-01',team:'N2',city:'Lucknow'},
+    // L&T (10 plants)
+    {name:'Hazira Complex',cust:'CUST-02',team:'W1',city:'Hazira'},
+    {name:'Powai Campus',cust:'CUST-02',team:'W2',city:'Mumbai'},
+    {name:'Kanchipuram Works',cust:'CUST-02',team:'S1',city:'Kanchipuram'},
+    {name:'Vadodara Plant',cust:'CUST-02',team:'W3',city:'Vadodara'},
+    {name:'Ahmednagar Unit',cust:'CUST-02',team:'W1',city:'Ahmednagar'},
+    {name:'Coimbatore Plant',cust:'CUST-02',team:'S2',city:'Coimbatore'},
+    {name:'Faridabad Unit',cust:'CUST-02',team:'N1',city:'Faridabad'},
+    {name:'Kolkata Office',cust:'CUST-02',team:'E1',city:'Kolkata'},
+    {name:'Bengaluru Tech',cust:'CUST-02',team:'S3',city:'Bengaluru'},
+    {name:'Vizag Shipyard',cust:'CUST-02',team:'S1',city:'Vizag'},
+    // HUL (10 plants)
+    {name:'Mumbai HQ',cust:'CUST-03',team:'W1',city:'Mumbai'},
+    {name:'Haridwar Plant',cust:'CUST-03',team:'N1',city:'Haridwar'},
+    {name:'Silvassa Unit',cust:'CUST-03',team:'W2',city:'Silvassa'},
+    {name:'Pondicherry Plant',cust:'CUST-03',team:'S1',city:'Pondicherry'},
+    {name:'Goa Factory',cust:'CUST-03',team:'W3',city:'Goa'},
+    {name:'Doom Dooma Unit',cust:'CUST-03',team:'E1',city:'Doom Dooma'},
+    {name:'Hosur Plant',cust:'CUST-03',team:'S2',city:'Hosur'},
+    {name:'Sumerpur Unit',cust:'CUST-03',team:'N2',city:'Sumerpur'},
+    {name:'Tatapuram Plant',cust:'CUST-03',team:'S3',city:'Tatapuram'},
+    {name:'Haldia Chemicals',cust:'CUST-03',team:'E2',city:'Haldia'},
+    // Maruti (10 plants)
+    {name:'Gurgaon Plant',cust:'CUST-04',team:'N1',city:'Gurgaon'},
+    {name:'Manesar Plant',cust:'CUST-04',team:'N2',city:'Manesar'},
+    {name:'Gujarat Plant',cust:'CUST-04',team:'W1',city:'Hansalpur'},
+    {name:'Rohtak R&D',cust:'CUST-04',team:'N3',city:'Rohtak'},
+    {name:'Sitapur Depot',cust:'CUST-04',team:'N1',city:'Sitapur'},
+    {name:'Pune Depot',cust:'CUST-04',team:'W2',city:'Pune'},
+    {name:'Indore Depot',cust:'CUST-04',team:'W3',city:'Indore'},
+    {name:'Jaipur Depot',cust:'CUST-04',team:'N2',city:'Jaipur'},
+    {name:'Bangalore Depot',cust:'CUST-04',team:'S1',city:'Bangalore'},
+    {name:'Hyderabad Depot',cust:'CUST-04',team:'S2',city:'Hyderabad'},
+    // Reliance (8 plants)
+    {name:'Jamnagar Refinery',cust:'CUST-05',team:'W1',city:'Jamnagar'},
+    {name:'Dahej Complex',cust:'CUST-05',team:'W2',city:'Dahej'},
+    {name:'Nagothane Plant',cust:'CUST-05',team:'W3',city:'Nagothane'},
+    {name:'Patalganga Unit',cust:'CUST-05',team:'W1',city:'Patalganga'},
+    {name:'Hazira Petro',cust:'CUST-05',team:'W2',city:'Hazira'},
+    {name:'Hoshiarpur Plant',cust:'CUST-05',team:'N1',city:'Hoshiarpur'},
+    {name:'Barabanki Unit',cust:'CUST-05',team:'N2',city:'Barabanki'},
+    {name:'Silvassa Unit',cust:'CUST-05',team:'W3',city:'Silvassa'}
+  ];
+
+  const plants = plantData.map((p,i)=>({
+    id:'PLT-'+ String(i+1).padStart(3,'0'),
+    name:p.name,
+    customerId:p.cust,
+    teamId:p.team,
+    city:p.city
+  }));
+
+  // Invoices (~180 open invoices)
+  const invoices = [];
+  let invCounter = 1;
+  const today = new Date();
+  plants.forEach(plant=>{
+    const numInv = 2 + Math.floor(Math.random()*4); // 2-5 invoices per plant
+    for(let i=0;i<numInv;i++){
+      const daysAgo = 10 + Math.floor(Math.random()*180);
+      const invDate = new Date(today);
+      invDate.setDate(invDate.getDate()-daysAgo);
+      const amount = Math.round((50000 + Math.random()*2000000)/100)*100;
+      const paidPct = Math.random()*0.6;
+      const balance = Math.round(amount * (1-paidPct)/100)*100;
+      if(balance <= 0) return;
+      const creditDays = [30,45,60,90][Math.floor(Math.random()*4)];
+      invoices.push({
+        id:'INV-'+String(invCounter++).padStart(5,'0'),
+        plantId:plant.id,
+        customerId:plant.customerId,
+        invoiceDate:invDate.toISOString().split('T')[0],
+        amount:amount,
+        balance:balance,
+        creditDays:creditDays
+      });
+    }
+  });
+
+  // Interest Configs (8 rules)
+  const configs = [
+    {id:'CFG-01',customerId:'ALL',method:'A',rate:12,graceDays:0,slabs:[],effectiveFrom:'2025-01-01',effectiveTo:'',active:true},
+    {id:'CFG-02',customerId:'CUST-01',method:'A',rate:15,graceDays:0,slabs:[],effectiveFrom:'2025-01-01',effectiveTo:'',active:true},
+    {id:'CFG-03',customerId:'CUST-02',method:'B',rate:14,graceDays:7,slabs:[],effectiveFrom:'2025-01-01',effectiveTo:'',active:true},
+    {id:'CFG-04',customerId:'CUST-03',method:'D',rate:0,graceDays:0,slabs:[
+      {minDays:0,maxDays:30,rate:0},
+      {minDays:31,maxDays:60,rate:12},
+      {minDays:61,maxDays:90,rate:18},
+      {minDays:91,maxDays:9999,rate:24}
+    ],effectiveFrom:'2025-04-01',effectiveTo:'',active:true},
+    {id:'CFG-05',customerId:'CUST-04',method:'C',rate:16,graceDays:15,slabs:[],effectiveFrom:'2025-01-01',effectiveTo:'',active:true},
+    {id:'CFG-06',customerId:'CUST-05',method:'A',rate:10,graceDays:0,slabs:[],effectiveFrom:'2025-01-01',effectiveTo:'',active:true},
+    {id:'CFG-07',customerId:'CUST-01',method:'D',rate:0,graceDays:0,slabs:[
+      {minDays:0,maxDays:45,rate:0},
+      {minDays:46,maxDays:90,rate:15},
+      {minDays:91,maxDays:9999,rate:21}
+    ],effectiveFrom:'2025-07-01',effectiveTo:'',active:false},
+    {id:'CFG-08',customerId:'ALL',method:'B',rate:18,graceDays:5,slabs:[],effectiveFrom:'2026-01-01',effectiveTo:'2026-12-31',active:false}
+  ];
+
+  save(SK.customers, customers);
+  save(SK.plants, plants);
+  save(SK.invoices, invoices);
+  save(SK.configs, configs);
+  // Store teams for reference
+  localStorage.setItem('idp_teams', JSON.stringify(teams));
+}
+
+/* ===== INIT ===== */
+seedIfNeeded();
+let customers = load(SK.customers);
+let plants = load(SK.plants);
+let invoices = load(SK.invoices);
+let configs = load(SK.configs);
+let teams = JSON.parse(localStorage.getItem('idp_teams'));
+
+/* ===== HELPERS ===== */
+function getCust(id){ return customers.find(c=>c.id===id); }
+function getPlant(id){ return plants.find(p=>p.id===id); }
+function getTeam(id){ return teams.find(t=>t.id===id); }
+
+function formatINR(amt){
+  if(amt>=10000000) return '\u20B9'+( amt/10000000).toFixed(2)+'Cr';
+  if(amt>=100000) return '\u20B9'+(amt/100000).toFixed(1)+'L';
+  return '\u20B9'+amt.toLocaleString('en-IN');
+}
+
+function daysBetween(d1,d2){
+  return Math.floor((new Date(d2)-new Date(d1))/(86400000));
+}
+
+function getDueDate(inv){
+  const d = new Date(inv.invoiceDate);
+  d.setDate(d.getDate()+inv.creditDays);
+  return d.toISOString().split('T')[0];
+}
+
+function getOverdueDays(inv, asOf){
+  const due = getDueDate(inv);
+  const refDate = asOf || new Date().toISOString().split('T')[0];
+  const days = daysBetween(due, refDate);
+  return Math.max(0, days);
+}
+
+function getAgingBucket(days){
+  if(days<=0) return {label:'Current',cls:'badge-d'};
+  if(days<=30) return {label:'0\u201330d',cls:'badge-a'};
+  if(days<=60) return {label:'31\u201360d',cls:'badge-b'};
+  if(days<=90) return {label:'61\u201390d',cls:'badge-c'};
+  return {label:'90d+',cls:'', style:'background:#FFEBEE;color:#C62828'};
+}
+
+const methodNames = {A:'Simple Daily',B:'Month-End',C:'Compounding',D:'Slab/Tiered'};
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+/* ===== INTEREST CALCULATION ENGINE ===== */
+function calcInterest(invoice, config, asOfDate){
+  const overdueDays = getOverdueDays(invoice, asOfDate);
+  const effectiveDays = Math.max(0, overdueDays - (config.graceDays||0));
+  if(effectiveDays <= 0) return {interest:0, days:overdueDays, effectiveDays:0, steps:['No overdue or within grace period']};
+
+  const bal = invoice.balance;
+  let interest = 0;
+  let steps = [];
+
+  switch(config.method){
+    case 'A': { // Simple Daily
+      interest = bal * (config.rate/100/365) * effectiveDays;
+      steps.push(`Balance: ${formatINR(bal)}`);
+      steps.push(`Rate: ${config.rate}% p.a. = ${(config.rate/365).toFixed(4)}% per day`);
+      steps.push(`Overdue: ${overdueDays} days - ${config.graceDays||0} grace = ${effectiveDays} chargeable days`);
+      steps.push(`Interest = ${formatINR(bal)} x ${config.rate}% / 365 x ${effectiveDays} = ${formatINR(Math.round(interest))}`);
+      break;
+    }
+    case 'B': { // Month-End
+      const months = Math.floor(effectiveDays/30);
+      interest = bal * (config.rate/100/12) * months;
+      steps.push(`Balance: ${formatINR(bal)}`);
+      steps.push(`Rate: ${config.rate}% p.a. = ${(config.rate/12).toFixed(2)}% per month`);
+      steps.push(`Overdue: ${effectiveDays} effective days = ${months} full months`);
+      steps.push(`Interest = ${formatINR(bal)} x ${config.rate}%/12 x ${months} = ${formatINR(Math.round(interest))}`);
+      break;
+    }
+    case 'C': { // Compounding monthly
+      const months = Math.floor(effectiveDays/30);
+      let principal = bal;
+      let totalInt = 0;
+      for(let m=1;m<=months;m++){
+        const mi = principal * (config.rate/100/12);
+        totalInt += mi;
+        steps.push(`Month ${m}: Principal ${formatINR(Math.round(principal))} x ${(config.rate/12).toFixed(2)}% = ${formatINR(Math.round(mi))}`);
+        principal += mi;
+      }
+      interest = totalInt;
+      steps.push(`Total compounded interest over ${months} months = ${formatINR(Math.round(interest))}`);
+      break;
+    }
+    case 'D': { // Slab
+      const slabs = config.slabs || [];
+      slabs.forEach(slab=>{
+        const daysInSlab = Math.max(0, Math.min(effectiveDays, slab.maxDays) - slab.minDays + (slab.minDays===0?0:0));
+        // Calculate days that fall within this slab
+        const slabStart = slab.minDays;
+        const slabEnd = slab.maxDays;
+        const actualStart = Math.max(0, slabStart);
+        const actualEnd = Math.min(effectiveDays, slabEnd);
+        const daysHere = Math.max(0, actualEnd - actualStart);
+        if(daysHere > 0 && slab.rate > 0){
+          const si = bal * (slab.rate/100/365) * daysHere;
+          interest += si;
+          steps.push(`Days ${slab.minDays}-${Math.min(slab.maxDays,effectiveDays)}: ${daysHere} days @ ${slab.rate}% = ${formatINR(Math.round(si))}`);
+        } else if(daysHere > 0){
+          steps.push(`Days ${slab.minDays}-${Math.min(slab.maxDays,effectiveDays)}: ${daysHere} days @ 0% (no charge)`);
+        }
+      });
+      steps.push(`Total slab interest = ${formatINR(Math.round(interest))}`);
+      break;
+    }
+  }
+  return {interest:Math.round(interest), days:overdueDays, effectiveDays, steps};
+}
+
+function getApplicableConfig(customerId){
+  // Customer-specific active config first, then ALL
+  const active = configs.filter(c=>c.active);
+  return active.find(c=>c.customerId===customerId) || active.find(c=>c.customerId==='ALL') || null;
+}
+
+/* ===== VIEWS ===== */
+function showView(view){
+  ['config','customers','invoices'].forEach(v=>{
+    document.getElementById('view-'+v).style.display = v===view?'':'none';
+  });
+  document.querySelectorAll('.nav-item').forEach((n,i)=>{
+    if(i<3) n.classList.toggle('active', ['config','dashboard','calculator'][i]===view ||
+      (['customers','invoices'].indexOf(view)>=0 && [3,4][['customers','invoices'].indexOf(view)]===i));
+  });
+  // Update nav active states for data items
+  const navItems = document.querySelectorAll('.nav-item');
+  navItems.forEach(n=>n.classList.remove('active'));
+  if(view==='config') navItems[0].classList.add('active');
+  else if(view==='customers') navItems[3].classList.add('active');
+  else if(view==='invoices') navItems[4].classList.add('active');
+
+  if(view==='customers') renderCustomers();
+  if(view==='invoices') renderInvoices();
+}
+
+/* ===== CONFIG TABLE ===== */
+function renderConfigs(){
+  const tbody = document.querySelector('#configTable tbody');
+  tbody.innerHTML = '';
+  configs.forEach(cfg=>{
+    const cust = cfg.customerId==='ALL' ? 'ALL (Default)' : getCust(cfg.customerId)?.name||cfg.customerId;
+    const methodBadge = `<span class="badge badge-${cfg.method.toLowerCase()}">${cfg.method}: ${methodNames[cfg.method]}</span>`;
+    let rateStr = cfg.method==='D'
+      ? cfg.slabs.map(s=>`${s.minDays}-${s.maxDays>9000?'\u221E':s.maxDays}d: ${s.rate}%`).join('<br>')
+      : `${cfg.rate}% p.a.`;
+    const period = cfg.effectiveFrom + (cfg.effectiveTo ? ' to '+cfg.effectiveTo : ' \u2192 ongoing');
+    const statusBadge = cfg.active
+      ? '<span class="badge badge-d">Active</span>'
+      : '<span class="badge" style="background:#F5F5F5;color:#999">Inactive</span>';
+    tbody.innerHTML += `<tr>
+      <td><strong>${cust}</strong></td>
+      <td>${methodBadge}</td>
+      <td>${rateStr}</td>
+      <td>${cfg.graceDays}</td>
+      <td style="font-size:12px">${period}</td>
+      <td>${statusBadge}</td>
+      <td>
+        <button class="btn btn-sm btn-outline" onclick="editConfig('${cfg.id}')">Edit</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteConfig('${cfg.id}')" style="margin-left:4px">Del</button>
+      </td>
+    </tr>`;
+  });
+}
+
+/* ===== CONFIG MODAL ===== */
+function openConfigModal(editId){
+  const modal = document.getElementById('configModal');
+  const sel = document.getElementById('cfgCustomer');
+  // Populate customer dropdown
+  sel.innerHTML = '<option value="ALL">ALL Customers (Default)</option>';
+  customers.forEach(c=>{ sel.innerHTML += `<option value="${c.id}">${c.name}</option>`; });
+
+  // Populate test invoice dropdown
+  const testSel = document.getElementById('testInvoice');
+  testSel.innerHTML = '<option value="">-- Pick an invoice to test --</option>';
+  invoices.slice(0,50).forEach(inv=>{
+    const p = getPlant(inv.plantId);
+    const c = getCust(inv.customerId);
+    testSel.innerHTML += `<option value="${inv.id}">${inv.id} | ${c?.name} | ${p?.name} | Bal: ${formatINR(inv.balance)}</option>`;
+  });
+
+  document.getElementById('testResult').innerHTML = '';
+
+  if(editId){
+    const cfg = configs.find(c=>c.id===editId);
+    document.getElementById('configModalTitle').textContent = 'Edit Interest Rule';
+    document.getElementById('cfgEditId').value = editId;
+    sel.value = cfg.customerId;
+    document.getElementById('cfgMethod').value = cfg.method;
+    document.getElementById('cfgRate').value = cfg.rate;
+    document.getElementById('cfgGrace').value = cfg.graceDays;
+    document.getElementById('cfgFrom').value = cfg.effectiveFrom;
+    document.getElementById('cfgTo').value = cfg.effectiveTo||'';
+    if(cfg.method==='D') renderSlabs(cfg.slabs);
+  } else {
+    document.getElementById('configModalTitle').textContent = 'New Interest Rule';
+    document.getElementById('cfgEditId').value = '';
+    document.getElementById('cfgMethod').value = 'A';
+    document.getElementById('cfgRate').value = 12;
+    document.getElementById('cfgGrace').value = 0;
+    document.getElementById('cfgFrom').value = '2025-01-01';
+    document.getElementById('cfgTo').value = '';
+  }
+  toggleSlabs();
+  modal.classList.add('show');
+}
+
+function closeConfigModal(){
+  document.getElementById('configModal').classList.remove('show');
+}
+
+function editConfig(id){ openConfigModal(id); }
+
+function deleteConfig(id){
+  if(!confirm('Delete this interest rule?')) return;
+  configs = configs.filter(c=>c.id!==id);
+  save(SK.configs, configs);
+  renderConfigs();
+  toast('Rule deleted');
+}
+
+function saveConfig(){
+  const editId = document.getElementById('cfgEditId').value;
+  const method = document.getElementById('cfgMethod').value;
+  const obj = {
+    id: editId || 'CFG-'+String(Date.now()).slice(-4),
+    customerId: document.getElementById('cfgCustomer').value,
+    method: method,
+    rate: parseFloat(document.getElementById('cfgRate').value)||0,
+    graceDays: parseInt(document.getElementById('cfgGrace').value)||0,
+    slabs: method==='D' ? collectSlabs() : [],
+    effectiveFrom: document.getElementById('cfgFrom').value,
+    effectiveTo: document.getElementById('cfgTo').value,
+    active: true
+  };
+  if(editId){
+    const idx = configs.findIndex(c=>c.id===editId);
+    if(idx>=0) configs[idx] = {...configs[idx], ...obj};
+  } else {
+    configs.push(obj);
+  }
+  save(SK.configs, configs);
+  renderConfigs();
+  closeConfigModal();
+  toast(editId ? 'Rule updated' : 'Rule created');
+}
+
+/* ===== SLABS ===== */
+function toggleSlabs(){
+  const m = document.getElementById('cfgMethod').value;
+  document.getElementById('slabGroup').style.display = m==='D'?'':'none';
+  document.getElementById('rateGroup').style.display = m==='D'?'none':'';
+  if(m==='D' && document.getElementById('slabRows').children.length===0){
+    renderSlabs([{minDays:0,maxDays:30,rate:0},{minDays:31,maxDays:60,rate:12},{minDays:61,maxDays:90,rate:18},{minDays:91,maxDays:9999,rate:24}]);
+  }
+}
+
+function renderSlabs(slabs){
+  const container = document.getElementById('slabRows');
+  container.innerHTML = '';
+  slabs.forEach((s,i)=>{
+    container.innerHTML += `<div class="slab-row">
+      <input type="number" value="${s.minDays}" placeholder="From" min="0" class="slab-min">
+      <span class="slab-label">to</span>
+      <input type="number" value="${s.maxDays}" placeholder="To" class="slab-max">
+      <span class="slab-label">days @</span>
+      <input type="number" value="${s.rate}" step="0.1" placeholder="Rate%" class="slab-rate">
+      <span class="slab-label">%</span>
+      <button onclick="this.parentElement.remove()">&times;</button>
+    </div>`;
+  });
+}
+
+function addSlabRow(){
+  const container = document.getElementById('slabRows');
+  const rows = container.querySelectorAll('.slab-row');
+  const lastMax = rows.length ? parseInt(rows[rows.length-1].querySelector('.slab-max').value)||0 : 0;
+  container.innerHTML += `<div class="slab-row">
+    <input type="number" value="${lastMax+1}" placeholder="From" min="0" class="slab-min">
+    <span class="slab-label">to</span>
+    <input type="number" value="${lastMax+30}" placeholder="To" class="slab-max">
+    <span class="slab-label">days @</span>
+    <input type="number" value="12" step="0.1" placeholder="Rate%" class="slab-rate">
+    <span class="slab-label">%</span>
+    <button onclick="this.parentElement.remove()">&times;</button>
+  </div>`;
+}
+
+function collectSlabs(){
+  const rows = document.querySelectorAll('#slabRows .slab-row');
+  return Array.from(rows).map(r=>({
+    minDays: parseInt(r.querySelector('.slab-min').value)||0,
+    maxDays: parseInt(r.querySelector('.slab-max').value)||9999,
+    rate: parseFloat(r.querySelector('.slab-rate').value)||0
+  }));
+}
+
+/* ===== TEST CALCULATION ===== */
+function runTest(){
+  const invId = document.getElementById('testInvoice').value;
+  if(!invId){ toast('Pick an invoice first'); return; }
+  const inv = invoices.find(i=>i.id===invId);
+  const method = document.getElementById('cfgMethod').value;
+  const tempConfig = {
+    method: method,
+    rate: parseFloat(document.getElementById('cfgRate').value)||0,
+    graceDays: parseInt(document.getElementById('cfgGrace').value)||0,
+    slabs: method==='D' ? collectSlabs() : []
+  };
+  const result = calcInterest(inv, tempConfig);
+  const plant = getPlant(inv.plantId);
+  const cust = getCust(inv.customerId);
+  document.getElementById('testResult').innerHTML = `
+    <div class="test-result">
+      <h3>Test: ${inv.id} | ${cust?.name} | ${plant?.name}</h3>
+      <div class="calc-step">Invoice Date: ${inv.invoiceDate} | Credit: ${inv.creditDays}d | Due: ${getDueDate(inv)}</div>
+      <div class="calc-step">Amount: ${formatINR(inv.amount)} | Balance: ${formatINR(inv.balance)}</div>
+      <div class="calc-step">Method: ${tempConfig.method} - ${methodNames[tempConfig.method]}</div>
+      <hr style="margin:8px 0;border:none;border-top:1px solid #ddd">
+      ${result.steps.map(s=>'<div class="calc-step">'+s+'</div>').join('')}
+      <div class="calc-total">Interest: ${formatINR(result.interest)}</div>
+    </div>
+  `;
+}
+
+/* ===== CUSTOMERS VIEW ===== */
+function renderCustomers(){
+  const summaryDiv = document.getElementById('cust-summary');
+  let html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">';
+  customers.forEach(c=>{
+    const cp = plants.filter(p=>p.customerId===c.id);
+    const ci = invoices.filter(i=>i.customerId===c.id);
+    const totalBal = ci.reduce((s,i)=>s+i.balance,0);
+    const regions = [...new Set(cp.map(p=>getTeam(p.teamId)?.region))];
+    html += `<div class="card" style="border-top:3px solid var(--moglix-red)">
+      <h3 style="font-size:15px;margin-bottom:4px">${c.name}</h3>
+      <div style="font-size:11px;color:var(--text-light);margin-bottom:12px">${c.code} | ${cp.length} plants | ${regions.join(', ')}</div>
+      <div style="display:flex;justify-content:space-between;font-size:13px">
+        <div><div style="font-size:10px;color:var(--text-light)">Open Invoices</div><strong>${ci.length}</strong></div>
+        <div><div style="font-size:10px;color:var(--text-light)">Outstanding</div><strong>${formatINR(totalBal)}</strong></div>
+      </div>
+    </div>`;
+  });
+  html += '</div>';
+  summaryDiv.innerHTML = html;
+
+  // Detail table
+  const detailDiv = document.getElementById('cust-detail');
+  let thtml = '<div class="card"><div class="tbl-wrap"><table><thead><tr><th>Plant ID</th><th>Plant Name</th><th>Customer</th><th>City</th><th>Team</th><th>Region</th><th>Open Inv.</th><th>Outstanding</th></tr></thead><tbody>';
+  plants.forEach(p=>{
+    const c = getCust(p.customerId);
+    const t = getTeam(p.teamId);
+    const pi = invoices.filter(i=>i.plantId===p.id);
+    const bal = pi.reduce((s,i)=>s+i.balance,0);
+    thtml += `<tr><td>${p.id}</td><td>${p.name}</td><td>${c?.name}</td><td>${p.city}</td><td>${t?.name}</td><td>${t?.region}</td><td>${pi.length}</td><td>${formatINR(bal)}</td></tr>`;
+  });
+  thtml += '</tbody></table></div></div>';
+  detailDiv.innerHTML = thtml;
+}
+
+function showCustView(type, btn){
+  document.getElementById('cust-summary').style.display = type==='summary'?'':'none';
+  document.getElementById('cust-detail').style.display = type==='detail'?'':'none';
+  btn.parentElement.querySelectorAll('.view-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+/* ===== INVOICES VIEW ===== */
+function renderInvoices(){
+  // Populate filter dropdown
+  const sel = document.getElementById('invFilterCust');
+  if(sel.options.length<=1){
+    customers.forEach(c=>{ sel.innerHTML += `<option value="${c.id}">${c.name}</option>`; });
+  }
+  const filterCust = sel.value;
+  const filterAging = document.getElementById('invFilterAging').value;
+
+  let filtered = [...invoices];
+  if(filterCust) filtered = filtered.filter(i=>i.customerId===filterCust);
+  if(filterAging){
+    filtered = filtered.filter(i=>{
+      const od = getOverdueDays(i);
+      switch(filterAging){
+        case 'current': return od<=30;
+        case 'overdue30': return od>30 && od<=60;
+        case 'overdue60': return od>60 && od<=90;
+        case 'overdue90': return od>90;
+      }
+    });
+  }
+
+  const tbody = document.querySelector('#invoiceTable tbody');
+  tbody.innerHTML = '';
+  filtered.slice(0,100).forEach(inv=>{
+    const plant = getPlant(inv.plantId);
+    const cust = getCust(inv.customerId);
+    const dueDate = getDueDate(inv);
+    const overdue = getOverdueDays(inv);
+    const aging = getAgingBucket(overdue);
+    tbody.innerHTML += `<tr>
+      <td><strong>${inv.id}</strong></td>
+      <td>${plant?.name||inv.plantId}</td>
+      <td>${cust?.name||inv.customerId}</td>
+      <td>${inv.invoiceDate}</td>
+      <td>${formatINR(inv.amount)}</td>
+      <td><strong>${formatINR(inv.balance)}</strong></td>
+      <td>${inv.creditDays}d</td>
+      <td>${dueDate}</td>
+      <td>${overdue>0?overdue+'d':'-'}</td>
+      <td><span class="badge ${aging.cls}" ${aging.style?'style="'+aging.style+'"':''}>${aging.label}</span></td>
+    </tr>`;
+  });
+  if(filtered.length>100){
+    tbody.innerHTML += `<tr><td colspan="10" style="text-align:center;color:var(--text-light);font-size:12px">Showing 100 of ${filtered.length} invoices</td></tr>`;
+  }
+}
+
+/* ===== INIT RENDER ===== */
+renderConfigs();
+</script>
+</body>
+</html>
