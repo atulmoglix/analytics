@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<title>MPL Bidding Panel</title>
+<script src="/socket.io/socket.io.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Oswald:wght@700&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --red: #D9232D; --gold: #c47b00; --goldl: #F5A623;
+    --green: #15803d; --greenl: #22c55e;
+    --bg: #f0f4f8; --white: #ffffff;
+    --border: #e2e8f0; --text: #0f172a; --muted: #64748b;
+  }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+
+  .header {
+    padding: 14px 20px; background: var(--white);
+    border-bottom: 3px solid var(--red);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .owner-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .owner-name  { font-family: 'Oswald', sans-serif; font-size: 24px; font-weight: 700; color: var(--text); }
+  .budget-pill {
+    background: #fffbeb; border: 2px solid #fde68a;
+    border-radius: 14px; padding: 8px 18px; text-align: center;
+  }
+  .budget-val   { font-family: 'Oswald', sans-serif; font-size: 28px; font-weight: 700; color: var(--gold); line-height: 1; }
+  .budget-label { font-size: 9px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+
+  .main { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+
+  .card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+  }
+  .card-title {
+    font-size: 9px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 12px;
+  }
+
+  /* Player on block */
+  .player-block { display: flex; align-items: center; gap: 14px; }
+  .player-av {
+    width: 60px; height: 60px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 900; color: #fff;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+  }
+  .player-info-name { font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 700; color: var(--text); }
+  .player-info-sub  { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .player-info-base { font-size: 12px; color: var(--muted); margin-top: 4px; font-weight: 600; }
+  .player-info-base span { color: var(--text); }
+
+  /* Live bid card */
+  .live-bid-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .live-bid-val {
+    font-family: 'Oswald', sans-serif; font-size: 52px; font-weight: 700;
+    color: var(--red); line-height: 1;
+  }
+  .live-bid-pts { font-size: 16px; color: var(--muted); }
+  .live-leader  { font-size: 16px; font-weight: 700; color: var(--green); margin-top: 4px; min-height: 20px; }
+  .live-leader.empty { color: var(--muted); font-weight: 400; font-style: italic; font-size: 13px; }
+  .you-leading-badge {
+    display: inline-block; margin-top: 6px;
+    background: #f0fdf4; border: 1px solid #86efac;
+    color: var(--green); font-size: 11px; font-weight: 700;
+    padding: 4px 12px; border-radius: 20px; letter-spacing: 1px;
+    animation: lglow 1.5s ease infinite alternate;
+  }
+  @keyframes lglow { from { box-shadow: none; } to { box-shadow: 0 0 12px rgba(34,197,94,0.35); } }
+
+  /* Timer mini */
+  .timer-mini {
+    width: 68px; height: 68px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Oswald', sans-serif; font-size: 28px; font-weight: 700;
+    border: 3px solid var(--border); color: var(--text);
+    transition: border-color 0.3s, color 0.3s;
+  }
+  .timer-mini.ok     { border-color: #86efac; color: var(--green); }
+  .timer-mini.warn   { border-color: #fde68a; color: #b45309; }
+  .timer-mini.danger { border-color: #fca5a5; color: var(--red); animation: tp 0.5s ease infinite alternate; }
+  @keyframes tp { from { transform: scale(1); } to { transform: scale(1.08); } }
+
+  /* Bid controls */
+  .bid-area { display: flex; flex-direction: column; gap: 10px; }
+  .quick-bids { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+  .qbid {
+    background: #f8fafc; border: 1px solid var(--border); border-radius: 10px;
+    color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700;
+    padding: 10px 4px; cursor: pointer; text-align: center;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  }
+  .qbid:hover:not(:disabled) { background: #f1f5f9; border-color: #cbd5e1; }
+  .qbid:active:not(:disabled) { transform: scale(0.96); }
+  .qbid:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  .bid-input {
+    width: 100%; background: #f8fafc; border: 2px solid var(--border);
+    border-radius: 12px; color: var(--text); font-size: 22px; font-weight: 700;
+    padding: 12px 16px; outline: none; text-align: center;
+    transition: border-color 0.2s;
+  }
+  .bid-input:focus { border-color: #fca5a5; }
+  .bid-input::placeholder { color: #cbd5e1; font-size: 14px; font-weight: 400; }
+  .bid-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  .btn-bid {
+    background: var(--red); border: none; border-radius: 14px; width: 100%;
+    color: #fff; font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 700;
+    letter-spacing: 2px; padding: 14px;
+    cursor: pointer; text-transform: uppercase;
+    box-shadow: 0 4px 20px rgba(217,35,45,0.3);
+    transition: transform 0.1s, box-shadow 0.2s, opacity 0.2s;
+  }
+  .btn-bid:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(217,35,45,0.4); }
+  .btn-bid:active:not(:disabled) { transform: scale(0.97); }
+  .btn-bid:disabled { opacity: 0.3; cursor: not-allowed; box-shadow: none; transform: none; }
+
+  .bid-hint  { font-size: 11px; color: var(--muted); text-align: center; }
+  .bid-error { font-size: 12px; color: var(--red); text-align: center; font-weight: 600; min-height: 16px; }
+
+  /* Squad */
+  .squad-list { display: flex; flex-direction: column; gap: 6px; }
+  .squad-item {
+    display: flex; align-items: center; justify-content: space-between;
+    background: #f8fafc; border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px;
+  }
+  .squad-name  { font-size: 14px; font-weight: 700; color: var(--text); }
+  .squad-dept  { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .squad-price { font-size: 15px; font-weight: 800; color: var(--gold); }
+  .squad-empty { font-size: 13px; color: var(--muted); font-style: italic; text-align: center; padding: 12px 0; }
+
+  /* Status banner */
+  .status-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 14px; padding: 24px; text-align: center;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+  }
+  .status-icon  { font-size: 40px; margin-bottom: 10px; }
+  .status-title { font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+  .status-sub   { font-size: 13px; color: var(--muted); }
+
+  /* Bid placed flash */
+  .bid-flash {
+    position: fixed; inset: 0; z-index: 50; pointer-events: none;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Oswald', sans-serif; font-size: 56px; font-weight: 700; color: var(--green);
+    background: rgba(240,253,244,0.7);
+    animation: bfOut 1.2s ease forwards;
+  }
+  @keyframes bfOut { 0%{opacity:0;transform:scale(0.7)} 30%{opacity:1;transform:scale(1)} 100%{opacity:0} }
+
+  .not-found { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:12px; padding:40px; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="owner-label">MPL E-Bidding</div>
+    <div class="owner-name" id="ownerNameHeader">—</div>
+  </div>
+  <div class="budget-pill">
+    <div class="budget-val" id="budgetVal">100</div>
+    <div class="budget-label">Points Left</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="not-found hidden" id="notFound">
+    <div style="font-size:48px">🚫</div>
+    <div style="font-size:20px;font-weight:700">Owner not found</div>
+    <div style="font-size:14px;color:var(--muted)">Check your link with the admin</div>
+  </div>
+
+  <!-- Status banners for non-bidding phases -->
+  <div class="status-card hidden" id="statusCard">
+    <div class="status-icon" id="statusIcon">⏳</div>
+    <div class="status-title" id="statusTitle">—</div>
+    <div class="status-sub"   id="statusSub">—</div>
+  </div>
+
+  <!-- Player on block -->
+  <div class="card hidden" id="playerCard">
+    <div class="card-title">On the Block</div>
+    <div class="player-block">
+      <div class="player-av" id="playerAv"></div>
+      <div>
+        <div class="player-info-name" id="playerInfoName">—</div>
+        <div class="player-info-sub"  id="playerInfoSub">—</div>
+        <div class="player-info-base">Base: <span id="playerInfoBase">—</span> pts</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live bid + timer -->
+  <div class="card hidden" id="liveBidCard">
+    <div class="card-title">Live Bid</div>
+    <div class="live-bid-row">
+      <div>
+        <div class="live-bid-val" id="liveBidVal">—</div>
+        <div class="live-leader empty" id="liveLeader">No bids yet</div>
+        <div id="youLeading" class="hidden"><span class="you-leading-badge">🏆 You're Leading!</span></div>
+      </div>
+      <div class="timer-mini ok" id="timerMini">20</div>
+    </div>
+  </div>
+
+  <!-- Bid controls -->
+  <div class="card hidden" id="bidCard">
+    <div class="card-title">Place Your Bid</div>
+    <div class="bid-area">
+      <div class="quick-bids" id="quickBids">
+        <button class="qbid" data-delta="1">+1</button>
+        <button class="qbid" data-delta="5">+5</button>
+        <button class="qbid" data-delta="10">+10</button>
+        <button class="qbid" data-delta="25">+25</button>
+      </div>
+      <input type="number" class="bid-input" id="bidInput" placeholder="Enter bid amount" min="1" />
+      <div class="bid-error" id="bidError"></div>
+      <button class="btn-bid" id="btnBid">BID NOW</button>
+      <div class="bid-hint" id="bidHint"></div>
+    </div>
+  </div>
+
+  <!-- Squad -->
+  <div class="card" id="squadCard">
+    <div class="card-title">Your Squad (<span id="squadCount">0</span>)</div>
+    <div class="squad-list" id="squadList">
+      <div class="squad-empty">No players yet — start bidding!</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const socket = io();
+const ownerId = window.location.pathname.split('/').pop();
+let myOwner = null;
+let currentState = null;
+
+socket.on('connect', () => socket.emit('owner:join', { ownerId }));
+
+socket.on('state', (s) => {
+  currentState = s;
+  myOwner = s.owners.find(o => o.id === ownerId);
+  render(s);
+});
+
+socket.on('bid:flash', ({ ownerName }) => {
+  if (ownerName === myOwner?.name) {
+    const el = document.createElement('div');
+    el.className = 'bid-flash';
+    el.textContent = '✓ BID PLACED';
+    document.body.appendChild(el);
+    el.addEventListener('animationend', () => el.remove());
+  }
+});
+
+function render(s) {
+  const nf = document.getElementById('notFound');
+  const sc = document.getElementById('statusCard');
+  const pc = document.getElementById('playerCard');
+  const lbc = document.getElementById('liveBidCard');
+  const bc  = document.getElementById('bidCard');
+
+  if (!myOwner) { nf.classList.remove('hidden'); return; }
+  nf.classList.add('hidden');
+
+  document.getElementById('ownerNameHeader').textContent = myOwner.name;
+  document.getElementById('budgetVal').textContent = myOwner.budget;
+
+  const phase = s.phase;
+
+  // Status card logic
+  const statusPhases = { setup: ['⏳','Auction not started yet','Admin is setting up…'], ready: ['🟡','Ready to start','Waiting for admin to begin…'], paused: ['⏸','Auction Paused','Admin will resume shortly…'], sold: null, unsold: null, bidding: null, finished: ['🏁','Auction Complete',`You won ${myOwner.squad.length} player(s)`] };
+
+  if (phase === 'sold') {
+    const isMe = s.leaderId === ownerId;
+    sc.classList.remove('hidden');
+    document.getElementById('statusIcon').textContent  = isMe ? '🎉' : '🔨';
+    document.getElementById('statusTitle').textContent = isMe ? `You won ${s.currentPlayer?.name}!` : `SOLD to ${s.leaderName}`;
+    document.getElementById('statusSub').textContent   = `${s.currentBid} pts · Next in ${s.nextIn}s`;
+    [pc, lbc, bc].forEach(el => el.classList.add('hidden'));
+  } else if (phase === 'unsold') {
+    sc.classList.remove('hidden');
+    document.getElementById('statusIcon').textContent  = '😶';
+    document.getElementById('statusTitle').textContent = 'No bids — Unsold';
+    document.getElementById('statusSub').textContent   = `Next player in ${s.nextIn}s`;
+    [pc, lbc, bc].forEach(el => el.classList.add('hidden'));
+  } else if (statusPhases[phase]) {
+    const [ico, title, sub] = statusPhases[phase];
+    sc.classList.remove('hidden');
+    document.getElementById('statusIcon').textContent  = ico;
+    document.getElementById('statusTitle').textContent = title;
+    document.getElementById('statusSub').textContent   = sub;
+    [pc, lbc, bc].forEach(el => el.classList.add('hidden'));
+  } else if (phase === 'bidding') {
+    sc.classList.add('hidden');
+    [pc, lbc, bc].forEach(el => el.classList.remove('hidden'));
+  }
+
+  // Player
+  if (s.currentPlayer) {
+    const [bg, lt] = avatarColor(s.currentPlayer.name);
+    const av = document.getElementById('playerAv');
+    av.style.background = `linear-gradient(135deg, ${bg}, ${lt})`;
+    av.textContent = initials(s.currentPlayer.name);
+    document.getElementById('playerInfoName').textContent = s.currentPlayer.name;
+    document.getElementById('playerInfoSub').textContent  = [s.currentPlayer.department, s.currentPlayer.designation].filter(Boolean).join(' · ');
+    document.getElementById('playerInfoBase').textContent = s.currentPlayer.base_price || 1;
+  }
+
+  // Live bid
+  const lbv = document.getElementById('liveBidVal');
+  lbv.innerHTML = s.currentBid > 0 ? `${s.currentBid}<span class="live-bid-pts"> pts</span>` : `<span style="color:#cbd5e1">—</span>`;
+
+  const ll = document.getElementById('liveLeader');
+  if (s.leaderName) { ll.textContent = `Leading: ${s.leaderName}`; ll.classList.remove('empty'); }
+  else { ll.textContent = 'No bids yet'; ll.classList.add('empty'); }
+
+  if (s.leaderId === ownerId) document.getElementById('youLeading').classList.remove('hidden');
+  else document.getElementById('youLeading').classList.add('hidden');
+
+  // Timer
+  const t = Math.max(0, s.timer);
+  const tm = document.getElementById('timerMini');
+  tm.textContent = phase === 'bidding' ? t : '—';
+  tm.className = 'timer-mini';
+  if (phase === 'bidding') {
+    if (t <= 5) tm.classList.add('danger');
+    else if (t <= 10) tm.classList.add('warn');
+    else tm.classList.add('ok');
+  }
+
+  // Bid controls
+  updateBidControls(s);
+  renderSquad();
+}
+
+function updateBidControls(s) {
+  const bidInput = document.getElementById('bidInput');
+  const btnBid   = document.getElementById('btnBid');
+  const bidHint  = document.getElementById('bidHint');
+  const qBids    = document.querySelectorAll('.qbid');
+  const canBid   = s.phase === 'bidding' && myOwner && myOwner.budget > 0;
+
+  btnBid.disabled   = !canBid;
+  bidInput.disabled = !canBid;
+  qBids.forEach(b => b.disabled = !canBid);
+
+  if (!canBid) { bidHint.textContent = myOwner?.budget === 0 ? 'Budget exhausted' : ''; return; }
+
+  const minBid = s.currentBid > 0 ? s.currentBid + 1 : (parseInt(s.currentPlayer?.base_price) || 1);
+  bidHint.textContent = `Min: ${minBid} pts · Your budget: ${myOwner.budget} pts`;
+  bidInput.min = minBid;
+  if (!bidInput.value || parseInt(bidInput.value) < minBid) bidInput.value = minBid;
+
+  qBids.forEach(b => {
+    const delta  = parseInt(b.dataset.delta);
+    const target = s.currentBid + delta;
+    b.textContent = target;
+    b.disabled    = !canBid || target > myOwner.budget;
+    b.onclick     = () => { bidInput.value = target; document.getElementById('bidError').textContent = ''; };
+  });
+}
+
+document.getElementById('btnBid').addEventListener('click', () => {
+  const s = currentState;
+  if (!s || !myOwner) return;
+  const amount = parseInt(document.getElementById('bidInput').value);
+  const errEl  = document.getElementById('bidError');
+  errEl.textContent = '';
+  if (isNaN(amount) || amount < 1) { errEl.textContent = 'Enter a valid amount'; return; }
+  if (amount <= s.currentBid) { errEl.textContent = `Must be above current bid (${s.currentBid} pts)`; return; }
+  if (amount > myOwner.budget) { errEl.textContent = `Exceeds your budget (${myOwner.budget} pts)`; return; }
+  socket.emit('owner:bid', { ownerId, amount });
+  document.getElementById('bidInput').value = '';
+});
+
+document.getElementById('bidInput').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('btnBid').click(); });
+
+function renderSquad() {
+  if (!myOwner) return;
+  document.getElementById('squadCount').textContent = myOwner.squad.length;
+  const list = document.getElementById('squadList');
+  if (!myOwner.squad.length) { list.innerHTML = '<div class="squad-empty">No players yet — start bidding!</div>'; return; }
+  list.innerHTML = myOwner.squad.map(p => `
+    <div class="squad-item">
+      <div>
+        <div class="squad-name">${p.name}</div>
+        <div class="squad-dept">${[p.department, p.designation].filter(Boolean).join(' · ')}</div>
+      </div>
+      <div class="squad-price">${p.soldPrice} pts</div>
+    </div>`).join('');
+}
+
+const AC = [['#7c3aed','#a78bfa'],['#0284c7','#7dd3fc'],['#059669','#6ee7b7'],['#d97706','#fcd34d'],['#dc2626','#fca5a5'],['#7e22ce','#d8b4fe'],['#0369a1','#93c5fd'],['#15803d','#86efac'],['#b45309','#fde68a']];
+function avatarColor(name) { return AC[name.charCodeAt(0) % AC.length]; }
+function initials(name) { return name.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase(); }
+</script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+player_id,name,department,designation,location,years_exp,skills,base_price
+P001,Aarav Sharma,Supply Chain,Senior Manager,Delhi,8,"Procurement, Vendor Management, SAP",15
+P002,Priya Mehta,Finance,Financial Analyst,Mumbai,5,"FP&A, Excel, Power BI",8
+P003,Rohit Verma,Technology,Software Engineer,Bangalore,4,"Python, SQL, APIs",10
+P004,Sneha Iyer,Marketing,Brand Manager,Mumbai,6,"Digital Marketing, SEO, Analytics",12
+P005,Arjun Nair,Operations,Operations Lead,Pune,7,"Process Improvement, Lean, Six Sigma",14
+P006,Kavya Reddy,HR,HR Business Partner,Hyderabad,5,"Talent Acquisition, L&D, HRIS",8
+P007,Vikram Singh,Sales,Regional Sales Head,Delhi,10,"B2B Sales, CRM, Key Accounts",18
+P008,Ananya Joshi,Product,Product Manager,Bangalore,6,"Roadmapping, Agile, User Research",13
+P009,Manish Gupta,Finance,CFO Office Analyst,Mumbai,4,"Financial Modelling, Budgeting, MIS",7
+P010,Pooja Nambiar,Technology,Data Engineer,Bangalore,3,"Spark, Kafka, dbt, Snowflake",9
+P011,Suresh Kumar,Supply Chain,Procurement Head,Chennai,12,"Strategic Sourcing, Contracts, ERP",20
+P012,Ritu Agarwal,Marketing,Performance Marketing Lead,Gurgaon,5,"Paid Media, Google Ads, Attribution",11
+P013,Aditya Bose,Technology,Backend Engineer,Hyderabad,5,"Java, Microservices, AWS",10
+P014,Divya Pillai,Operations,Logistics Manager,Mumbai,8,"3PL, Last Mile, Fleet Management",15
+P015,Karan Malhotra,Sales,Enterprise Sales Manager,Delhi,9,"SaaS Sales, BANT, Salesforce",16
+P016,Simran Kaur,HR,Talent Acquisition Lead,Gurgaon,6,"Niche Hiring, EVP, LinkedIn",10
+P017,Nikhil Mehta,Finance,Treasury Analyst,Mumbai,4,"Cash Flow, FX, Investments",8
+P018,Deepa Krishnan,Product,UX Designer,Bangalore,5,"Figma, Design Systems, Research",9
+P019,Rajesh Patel,Technology,DevOps Engineer,Pune,6,"Kubernetes, CI/CD, Terraform",12
+P020,Neha Sharma,Supply Chain,Category Manager,Delhi,7,"Category Strategy, Negotiation, P&L",13

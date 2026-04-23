@@ -175,6 +175,7 @@ header{
 .proj-card.blue-card::before{background:linear-gradient(90deg,#3B82F6,#06B6D4)}
 .proj-card.gold-card::before{background:linear-gradient(90deg,var(--gold),var(--gold-light))}
 .proj-card.purple-card::before{background:linear-gradient(90deg,#7C3AED,#A78BFA)}
+.proj-card.orange-card::before{background:linear-gradient(90deg,#EA580C,#F97316)}
 .proj-card:hover::before{opacity:1;height:3px}
 
 .proj-card-glow{
@@ -186,6 +187,7 @@ header{
 .red-card .proj-card-glow{background:radial-gradient(circle,rgba(217,35,45,.12),transparent 70%)}
 .blue-card .proj-card-glow{background:radial-gradient(circle,rgba(59,130,246,.1),transparent 70%)}
 .gold-card .proj-card-glow{background:radial-gradient(circle,rgba(201,162,39,.12),transparent 70%)}
+.orange-card .proj-card-glow{background:radial-gradient(circle,rgba(234,88,12,.12),transparent 70%)}
 .proj-card:hover .proj-card-glow{opacity:1}
 
 .proj-num{
@@ -209,6 +211,7 @@ header{
 .red-card .proj-icon{background:rgba(217,35,45,.12);border:1px solid rgba(217,35,45,.2)}
 .blue-card .proj-icon{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2)}
 .gold-card .proj-icon{background:rgba(201,162,39,.1);border:1px solid rgba(201,162,39,.2)}
+.orange-card .proj-icon{background:rgba(234,88,12,.1);border:1px solid rgba(234,88,12,.2)}
 
 .proj-name{font-size:22px;font-weight:800;margin-bottom:6px;line-height:1.2}
 .proj-tagline{font-size:13px;color:rgba(255,255,255,.6);margin-bottom:18px;font-weight:400}
@@ -257,6 +260,29 @@ header{
 .red-card:hover .proj-launch{color:var(--red)}
 .blue-card:hover .proj-launch{color:#3B82F6}
 .gold-card:hover .proj-launch{color:var(--gold)}
+.orange-card .proj-num{color:#EA580C}
+
+/* Multi-link grid for event cards */
+.proj-links{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:auto}
+.proj-link-btn{
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:9px;padding:9px 12px;
+  font-size:12px;font-weight:600;color:var(--text);
+  text-decoration:none;transition:.2s;
+}
+.proj-link-btn:hover{background:rgba(255,255,255,.09);border-color:var(--border-hover);color:#EA580C}
+.proj-link-btn.full{grid-column:1/-1}
+.proj-link-btn.csv-btn{background:rgba(201,162,39,.06);border-color:rgba(201,162,39,.2);color:var(--gold)}
+.proj-link-btn.csv-btn:hover{background:rgba(201,162,39,.12);border-color:rgba(201,162,39,.4)}
+.proj-link-icon{font-size:14px}
+.proj-server-note{
+  grid-column:1/-1;
+  font-size:10px;color:var(--text-muted);
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:8px;padding:7px 12px;
+  font-family:monospace;letter-spacing:.3px;
+}
 .launch-arrow{font-size:18px;transition:transform .2s}
 .proj-card:hover .launch-arrow{transform:translate(3px,-3px)}
 
@@ -323,6 +349,8 @@ footer{
 .proj-card:nth-child(1){animation:fadeUp .5s .1s ease both}
 .proj-card:nth-child(2){animation:fadeUp .5s .2s ease both}
 .proj-card:nth-child(3){animation:fadeUp .5s .3s ease both}
+.proj-card:nth-child(4){animation:fadeUp .5s .4s ease both}
+.proj-card:nth-child(5){animation:fadeUp .5s .5s ease both}
 </style>
 </head>
 <body>
@@ -337,7 +365,7 @@ footer{
     </div>
   </div>
   <div class="header-right">
-    <div class="header-tag">&#9679; 3 Projects</div>
+    <div class="header-tag">&#9679; 5 Projects</div>
     <a class="ar-pill" href="#" title="Built by Atul Rai">
       <div class="ar-mono">AR</div>
       <span class="ar-label">Atul Rai &middot; Data &amp; Analytics</span>
@@ -359,7 +387,7 @@ footer{
   <div class="hero-divider"></div>
   <div class="hero-stats">
     <div class="hero-stat">
-      <div class="hs-val">3<span>+</span></div>
+      <div class="hs-val">5<span>+</span></div>
       <div class="hs-label">Tools Built</div>
     </div>
     <div class="hero-stat">
@@ -534,6 +562,60 @@ footer{
         <span class="launch-arrow">&#8599;</span>
       </div>
     </a>
+
+    <!-- Card 5: MPL E-Bidding -->
+    <div class="proj-card orange-card">
+      <div class="proj-card-glow"></div>
+      <div class="proj-num">
+        05 &mdash; Event
+        <span class="proj-status">Live &middot; Node.js</span>
+      </div>
+      <div class="proj-icon">&#9883;</div>
+      <div class="proj-name">MPL E-Bidding</div>
+      <div class="proj-tagline">Real-Time Employee Auction Platform</div>
+      <p class="proj-desc">
+        IPL-style live employee auction for Moglix Premier League. 150 players, up to 10 owner teams,
+        real-time bidding with Socket.io, 20-second countdown that extends by 10s on every bid,
+        automatic sold &amp; next-player flow &mdash; all live on a projector screen.
+      </p>
+      <div class="proj-features">
+        <span class="feat-chip">Real-Time Socket.io</span>
+        <span class="feat-chip">20s + 10s Bid Timer</span>
+        <span class="feat-chip">Up to 10 Owners</span>
+        <span class="feat-chip">100 pts Budget</span>
+        <span class="feat-chip">CSV Player Upload</span>
+        <span class="feat-chip">TV Display Mode</span>
+        <span class="feat-chip">Confetti on Sold</span>
+        <span class="feat-chip">Next-player Countdown</span>
+      </div>
+      <div class="proj-links">
+        <div class="proj-server-note">&#9654; cd mpl-ebidding &amp;&amp; npm start &nbsp;&#8594;&nbsp; localhost:3000</div>
+        <a class="proj-link-btn full" href="http://localhost:3000/admin.html" target="_blank">
+          &#9881; Admin Panel &mdash; Configure owners &amp; control auction
+          <span class="proj-link-icon">&#8599;</span>
+        </a>
+        <a class="proj-link-btn full" href="http://localhost:3000/display.html" target="_blank">
+          &#128250; Live Auction Display &mdash; Put this on the projector
+          <span class="proj-link-icon">&#8599;</span>
+        </a>
+        <a class="proj-link-btn" href="http://localhost:3000/owner/owner_1" target="_blank">
+          &#128100; Owner 1 Bid Panel <span class="proj-link-icon">&#8599;</span>
+        </a>
+        <a class="proj-link-btn" href="http://localhost:3000/owner/owner_2" target="_blank">
+          &#128100; Owner 2 Bid Panel <span class="proj-link-icon">&#8599;</span>
+        </a>
+        <a class="proj-link-btn" href="http://localhost:3000/owner/owner_3" target="_blank">
+          &#128100; Owner 3 Bid Panel <span class="proj-link-icon">&#8599;</span>
+        </a>
+        <a class="proj-link-btn" href="http://localhost:3000/owner/owner_4" target="_blank">
+          &#128100; Owner 4 Bid Panel <span class="proj-link-icon">&#8599;</span>
+        </a>
+        <a class="proj-link-btn csv-btn full" href="mpl-ebidding/sample-players.csv" download>
+          &#128203; Download Sample Players CSV (20 employees &mdash; replace with your 150)
+          <span class="proj-link-icon">&#8595;</span>
+        </a>
+      </div>
+    </div>
 
   </div>
 </div>

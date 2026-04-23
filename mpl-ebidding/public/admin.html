@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MPL E-Bidding — Admin</title>
+<script src="/socket.io/socket.io.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Oswald:wght@700&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --red: #D9232D; --gold: #c47b00; --green: #15803d; --greenl: #22c55e;
+    --bg: #f0f4f8; --white: #ffffff; --border: #e2e8f0;
+    --text: #0f172a; --muted: #64748b; --shadow: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; }
+
+  .header {
+    padding: 14px 28px; background: var(--white);
+    border-bottom: 3px solid var(--red);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .header-title { font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: 1px; }
+  .header-badge { font-size: 10px; background: #fef2f2; border: 1px solid #fca5a5; color: var(--red); padding: 4px 12px; border-radius: 20px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; }
+  .header-links { display: flex; gap: 10px; align-items: center; }
+  .link-btn {
+    font-size: 12px; font-weight: 600; padding: 7px 16px; border-radius: 8px;
+    background: #f1f5f9; border: 1px solid var(--border);
+    color: var(--text); text-decoration: none; cursor: pointer;
+    transition: background 0.15s; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .link-btn:hover { background: #e2e8f0; }
+
+  .page { max-width: 980px; margin: 0 auto; padding: 24px 20px; display: flex; flex-direction: column; gap: 22px; }
+
+  .section-title { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+
+  .card { background: var(--white); border: 1px solid var(--border); border-radius: 14px; padding: 20px; box-shadow: var(--shadow); }
+
+  .setup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 640px) { .setup-grid { grid-template-columns: 1fr; } }
+
+  input[type="text"], input[type="number"] {
+    background: #f8fafc; border: 1.5px solid var(--border);
+    border-radius: 10px; color: var(--text); font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600; padding: 9px 14px; width: 100%; outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus { border-color: #fca5a5; }
+
+  .owner-inputs { display: flex; flex-direction: column; gap: 8px; }
+  .owner-row-input { display: flex; gap: 8px; align-items: center; }
+  .owner-num { font-size: 12px; font-weight: 700; color: var(--muted); width: 22px; flex-shrink: 0; }
+  .btn-remove { background: #f8fafc; border: 1px solid var(--border); color: var(--muted); border-radius: 8px; padding: 7px 10px; cursor: pointer; font-size: 13px; transition: all 0.15s; flex-shrink: 0; }
+  .btn-remove:hover { border-color: #fca5a5; color: var(--red); background: #fef2f2; }
+
+  .btn {
+    border: none; border-radius: 10px; font-family: 'Inter', sans-serif;
+    font-size: 13px; font-weight: 700; padding: 9px 18px;
+    cursor: pointer; transition: all 0.15s;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-red    { background: var(--red); color: #fff; box-shadow: 0 2px 10px rgba(217,35,45,0.25); }
+  .btn-red:hover { background: #b91c1c; }
+  .btn-green  { background: #f0fdf4; color: var(--green); border: 1.5px solid #86efac; }
+  .btn-green:hover { background: #dcfce7; }
+  .btn-gold   { background: #fffbeb; color: var(--gold); border: 1.5px solid #fde68a; }
+  .btn-gold:hover { background: #fef9c3; }
+  .btn-gray   { background: #f1f5f9; color: var(--text); border: 1.5px solid var(--border); }
+  .btn-gray:hover { background: #e2e8f0; }
+  .btn-danger { background: #fef2f2; color: var(--red); border: 1.5px solid #fca5a5; }
+  .btn-danger:hover { background: #fee2e2; }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  /* Status bar */
+  .status-bar {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px;
+  }
+  .phase-pill {
+    font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+    padding: 5px 14px; border-radius: 20px;
+  }
+  .phase-setup    { background: #f1f5f9; color: var(--muted); border: 1px solid var(--border); }
+  .phase-ready    { background: #fffbeb; color: var(--gold); border: 1px solid #fde68a; }
+  .phase-bidding  { background: #f0fdf4; color: var(--green); border: 1px solid #86efac; }
+  .phase-sold     { background: #fffbeb; color: var(--gold); border: 1px solid #fde68a; }
+  .phase-paused   { background: #fff7ed; color: #b45309; border: 1px solid #fed7aa; }
+  .phase-finished { background: #fef2f2; color: var(--red); border: 1px solid #fca5a5; }
+  .status-info { font-size: 13px; font-weight: 600; color: var(--text); }
+
+  .controls-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  /* Owner links */
+  .owner-links { display: flex; flex-direction: column; gap: 8px; }
+  .owner-link-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: #f8fafc; border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px;
+  }
+  .ol-name   { font-size: 14px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .ol-budget { font-size: 12px; color: var(--gold); font-weight: 700; margin-top: 2px; }
+  .ol-url {
+    font-size: 11px; background: #f1f5f9; border: 1px solid var(--border); border-radius: 6px;
+    padding: 5px 12px; color: var(--muted); font-family: monospace; cursor: pointer; user-select: all;
+    transition: all 0.15s;
+  }
+  .ol-url:hover { background: #e2e8f0; color: var(--text); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .dot-on  { background: var(--greenl); box-shadow: 0 0 6px var(--greenl); }
+  .dot-off { background: #cbd5e1; }
+
+  /* Upload */
+  .upload-area {
+    border: 2px dashed var(--border); border-radius: 12px; padding: 24px;
+    text-align: center; cursor: pointer; transition: all 0.2s;
+  }
+  .upload-area:hover { border-color: #fca5a5; background: #fef2f2; }
+  .upload-icon  { font-size: 30px; margin-bottom: 8px; }
+  .upload-label { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .upload-sub   { font-size: 12px; color: var(--muted); }
+  .upload-ok    { font-size: 13px; font-weight: 700; color: var(--green); margin-top: 8px; }
+
+  /* Sold table */
+  .sold-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .sold-table th {
+    text-align: left; padding: 10px 14px; font-size: 10px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--muted);
+    border-bottom: 1px solid var(--border); background: #f8fafc;
+  }
+  .sold-table td { padding: 10px 14px; border-bottom: 1px solid #f1f5f9; color: var(--text); }
+  .sold-table tr:last-child td { border-bottom: none; }
+  .sold-table tr:hover td { background: #f8fafc; }
+  .price-cell { font-weight: 800; color: var(--gold); }
+  .sold-empty { text-align: center; padding: 24px; color: var(--muted); font-style: italic; }
+
+  .toast {
+    position: fixed; bottom: 24px; right: 24px; z-index: 999;
+    background: var(--white); border-radius: 10px; padding: 12px 20px;
+    font-size: 13px; font-weight: 700; box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    animation: toastIn 0.3s ease; border: 1.5px solid var(--border);
+  }
+  .toast.success { border-color: #86efac; color: var(--green); }
+  .toast.error   { border-color: #fca5a5; color: var(--red); }
+  @keyframes toastIn { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform:none; } }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div style="display:flex;align-items:center;gap:12px">
+    <div style="width:40px;height:40px;border-radius:8px;background:var(--red);display:flex;align-items:center;justify-content:center;font-family:'Oswald',sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:1px">MPL</div>
+    <div class="header-title">MPL E-BIDDING — ADMIN</div>
+  </div>
+  <div class="header-links">
+    <a href="/display.html" target="_blank" class="link-btn">📺 Open Display</a>
+    <span class="header-badge">Admin</span>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- Status -->
+  <div>
+    <div class="section-title">Auction Status</div>
+    <div class="status-bar">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span class="phase-pill phase-setup" id="phaseLabel">SETUP</span>
+        <span class="status-info" id="statusInfo">Configure owners and load players to begin</span>
+      </div>
+      <span id="playerCounter" style="font-size:13px;font-weight:600;color:var(--muted)"></span>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div>
+    <div class="section-title">Auction Controls</div>
+    <div class="card">
+      <div class="controls-row">
+        <button class="btn btn-green" id="btnStart"  disabled>▶  Start Auction</button>
+        <button class="btn btn-gold"  id="btnNext"   disabled>⏭  Next Player</button>
+        <button class="btn btn-gray"  id="btnSkip"   disabled>↩  Skip (push to end)</button>
+        <button class="btn btn-gray"  id="btnPause"  disabled>⏸  Pause</button>
+        <button class="btn btn-gray"  id="btnResume" disabled>▶  Resume</button>
+        <button class="btn btn-danger" id="btnReset" style="margin-left:auto">↺  Reset All</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Setup grid -->
+  <div class="setup-grid">
+
+    <div>
+      <div class="section-title">Configure Owners</div>
+      <div class="card">
+        <div class="owner-inputs" id="ownerInputs">
+          <div class="owner-row-input">
+            <span class="owner-num">1</span>
+            <input type="text" placeholder="Owner / team name" />
+            <button class="btn-remove" onclick="removeOwnerRow(this)">✕</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:14px">
+          <button class="btn btn-gray" onclick="addOwnerRow()">+ Add Owner</button>
+          <button class="btn btn-red"  id="btnSetOwners">Save Owners</button>
+        </div>
+        <div style="margin-top:10px;font-size:11px;color:var(--muted)">Each owner starts with 100 pts · Max 10 owners</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Load Players CSV</div>
+      <div class="card">
+        <div class="upload-area" id="uploadArea" onclick="document.getElementById('csvFile').click()">
+          <div class="upload-icon">📋</div>
+          <div class="upload-label">Upload Players CSV</div>
+          <div class="upload-sub">Click to browse · Required: name, department, designation, location, base_price</div>
+          <div class="upload-ok hidden" id="uploadOk"></div>
+        </div>
+        <input type="file" id="csvFile" accept=".csv" style="display:none" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Owner links -->
+  <div id="ownerLinksWrap" style="display:none">
+    <div class="section-title">Owner Bidding Links — Share with each participant</div>
+    <div class="owner-links" id="ownerLinks"></div>
+  </div>
+
+  <!-- Sold log -->
+  <div>
+    <div class="section-title">Sold Log (<span id="soldCount">0</span>)</div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <table class="sold-table">
+        <thead>
+          <tr><th>#</th><th>Player</th><th>Department</th><th>Designation</th><th>Sold To</th><th>Price</th></tr>
+        </thead>
+        <tbody id="soldLog">
+          <tr><td colspan="6" class="sold-empty">No sales yet</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const socket = io();
+let state = null;
+
+socket.on('state', (s) => { state = s; render(s); });
+
+function render(s) {
+  const phaseEl = document.getElementById('phaseLabel');
+  const map = {
+    setup:    ['SETUP',    'phase-setup'],
+    ready:    ['READY',    'phase-ready'],
+    bidding:  ['● LIVE',   'phase-bidding'],
+    sold:     ['SOLD',     'phase-sold'],
+    unsold:   ['UNSOLD',   'phase-sold'],
+    paused:   ['PAUSED',   'phase-paused'],
+    finished: ['FINISHED', 'phase-finished'],
+  };
+  const [lbl, cls] = map[s.phase] || ['—','phase-setup'];
+  phaseEl.textContent = lbl;
+  phaseEl.className = `phase-pill ${cls}`;
+
+  const infoMap = {
+    setup:    'Configure owners and load players to begin',
+    ready:    `${s.totalPlayers} players · ${s.owners.length} owners ready — hit Start`,
+    bidding:  `Player ${s.currentIndex+1}/${s.totalPlayers}: ${s.currentPlayer?.name} — Bid: ${s.currentBid} pts · ${s.timer}s left`,
+    sold:     `${s.currentPlayer?.name} → ${s.leaderName} for ${s.currentBid} pts · Next in ${s.nextIn}s`,
+    unsold:   `${s.currentPlayer?.name} unsold · Next in ${s.nextIn}s`,
+    paused:   `Paused on Player ${s.currentIndex+1}: ${s.currentPlayer?.name}`,
+    finished: `Auction complete — ${s.soldLog.length} players sold`,
+  };
+  document.getElementById('statusInfo').textContent = infoMap[s.phase] || '';
+  document.getElementById('playerCounter').textContent = s.totalPlayers > 0 ? `${s.soldLog.length} sold / ${s.totalPlayers} total` : '';
+
+  // Buttons
+  document.getElementById('btnStart').disabled  = s.phase !== 'ready';
+  document.getElementById('btnNext').disabled   = !['bidding','sold','unsold'].includes(s.phase);
+  document.getElementById('btnSkip').disabled   = s.phase !== 'bidding';
+  document.getElementById('btnPause').disabled  = s.phase !== 'bidding';
+  document.getElementById('btnResume').disabled = s.phase !== 'paused';
+
+  // Owner links
+  const olw = document.getElementById('ownerLinksWrap');
+  const ol  = document.getElementById('ownerLinks');
+  if (s.owners.length > 0) {
+    olw.style.display = 'block';
+    ol.innerHTML = s.owners.map(o => `
+      <div class="owner-link-row">
+        <div>
+          <div class="ol-name"><span class="dot ${o.connected ? 'dot-on' : 'dot-off'}"></span>${o.name}</div>
+          <div class="ol-budget">${o.budget} pts remaining · ${o.squad.length} player(s) won</div>
+        </div>
+        <div class="ol-url" onclick="copyLink('${o.id}')" title="Click to copy">${window.location.origin}/owner/${o.id}</div>
+      </div>`).join('');
+  } else { olw.style.display = 'none'; }
+
+  // Sold log
+  document.getElementById('soldCount').textContent = s.soldLog.length;
+  const sl = document.getElementById('soldLog');
+  if (!s.soldLog.length) { sl.innerHTML = '<tr><td colspan="6" class="sold-empty">No sales yet</td></tr>'; return; }
+  sl.innerHTML = s.soldLog.map((e, i) => `
+    <tr>
+      <td style="color:var(--muted);font-weight:600">${i+1}</td>
+      <td style="font-weight:700">${e.player.name}</td>
+      <td style="color:var(--muted)">${e.player.department || '—'}</td>
+      <td style="color:var(--muted)">${e.player.designation || '—'}</td>
+      <td style="font-weight:600">${e.ownerName}</td>
+      <td class="price-cell">${e.amount} pts</td>
+    </tr>`).join('');
+}
+
+document.getElementById('btnStart').addEventListener('click',  () => socket.emit('admin:start'));
+document.getElementById('btnNext').addEventListener('click',   () => socket.emit('admin:next'));
+document.getElementById('btnSkip').addEventListener('click',   () => socket.emit('admin:skip'));
+document.getElementById('btnPause').addEventListener('click',  () => socket.emit('admin:pause'));
+document.getElementById('btnResume').addEventListener('click', () => socket.emit('admin:resume'));
+document.getElementById('btnReset').addEventListener('click',  () => { if (confirm('Reset entire auction? This cannot be undone.')) socket.emit('admin:reset'); });
+
+function addOwnerRow() {
+  const inputs = document.getElementById('ownerInputs');
+  if (inputs.children.length >= 10) { toast('Maximum 10 owners', 'error'); return; }
+  const div = document.createElement('div');
+  div.className = 'owner-row-input';
+  div.innerHTML = `
+    <span class="owner-num">${inputs.children.length+1}</span>
+    <input type="text" placeholder="Owner / team name" />
+    <button class="btn-remove" onclick="removeOwnerRow(this)">✕</button>`;
+  inputs.appendChild(div);
+}
+
+function removeOwnerRow(btn) {
+  const inputs = document.getElementById('ownerInputs');
+  if (inputs.children.length <= 1) return;
+  btn.closest('.owner-row-input').remove();
+  document.querySelectorAll('#ownerInputs .owner-num').forEach((el, i) => el.textContent = i+1);
+}
+
+document.getElementById('btnSetOwners').addEventListener('click', () => {
+  const names = Array.from(document.querySelectorAll('#ownerInputs input')).map(i => i.value.trim()).filter(Boolean);
+  if (!names.length) { toast('Add at least one owner', 'error'); return; }
+  socket.emit('admin:setOwners', names);
+  toast(`${names.length} owners saved`, 'success');
+});
+
+document.getElementById('csvFile').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const players = parseCSV(ev.target.result);
+      if (!players.length) { toast('No valid players found', 'error'); return; }
+      socket.emit('admin:loadPlayers', players);
+      const ok = document.getElementById('uploadOk');
+      ok.textContent = `✓ ${players.length} players loaded`;
+      ok.classList.remove('hidden');
+      toast(`${players.length} players loaded`, 'success');
+    } catch { toast('Invalid CSV format', 'error'); }
+  };
+  reader.readAsText(file);
+});
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n').filter(l => l.trim());
+  if (lines.length < 2) return [];
+  const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,''));
+  return lines.slice(1).map(line => {
+    const vals = splitCSVLine(line);
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = (vals[i] || '').trim().replace(/^"|"$/g,''));
+    return obj;
+  }).filter(p => p.name);
+}
+
+function splitCSVLine(line) {
+  const result = []; let cur = ''; let inQ = false;
+  for (const c of line) {
+    if (c === '"') { inQ = !inQ; }
+    else if (c === ',' && !inQ) { result.push(cur); cur = ''; }
+    else cur += c;
+  }
+  result.push(cur);
+  return result;
+}
+
+function copyLink(ownerId) {
+  navigator.clipboard.writeText(`${window.location.origin}/owner/${ownerId}`)
+    .then(() => toast('Link copied!', 'success'));
+}
+
+function toast(msg, type = 'success') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`; el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+</script>
+</body>
+</html>

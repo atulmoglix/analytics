@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MPL E-Bidding — Live Auction</title>
+<script src="/socket.io/socket.io.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Oswald:wght@600;700&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red:    #D9232D;
+    --gold:   #c47b00;
+    --goldl:  #F5A623;
+    --green:  #15803d;
+    --greenl: #22c55e;
+    --bg:     #f0f4f8;
+    --white:  #ffffff;
+    --card:   #ffffff;
+    --border: #e2e8f0;
+    --text:   #0f172a;
+    --muted:  #64748b;
+    --shadow: 0 2px 16px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 40px rgba(0,0,0,0.12);
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Header ── */
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 28px;
+    background: var(--white);
+    border-bottom: 3px solid var(--red);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    flex-shrink: 0;
+  }
+  .logo-wrap { display: flex; align-items: center; gap: 12px; }
+  .logo-badge {
+    width: 46px; height: 46px; border-radius: 10px;
+    background: var(--red);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 700;
+    color: #fff; letter-spacing: 1px;
+  }
+  .logo-title { font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: 2px; }
+  .logo-sub { font-size: 10px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; margin-top: 1px; }
+  .header-stats { display: flex; gap: 28px; }
+  .hstat { text-align: center; }
+  .hstat-val { font-family: 'Oswald', sans-serif; font-size: 24px; font-weight: 700; color: var(--red); }
+  .hstat-lbl { font-size: 9px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+
+  /* ── Layout ── */
+  .main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 260px 1fr 280px;
+    overflow: hidden;
+  }
+
+  /* ── Bid History Panel ── */
+  .panel {
+    background: var(--white);
+    border-right: 1px solid var(--border);
+    padding: 18px 14px;
+    display: flex; flex-direction: column; gap: 8px;
+    overflow: hidden;
+  }
+  .panel-right { border-right: none; border-left: 1px solid var(--border); }
+  .panel-title {
+    font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 6px;
+  }
+  .bid-item {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex; justify-content: space-between; align-items: center;
+    animation: slideInLeft 0.3s ease;
+  }
+  .bid-item:first-of-type {
+    background: #fffbeb;
+    border-color: #fde68a;
+  }
+  .bid-rank { font-size: 11px; color: var(--muted); font-weight: 600; }
+  .bid-owner-name { font-size: 14px; font-weight: 700; color: var(--text); }
+  .bid-amt { font-size: 18px; font-weight: 900; color: var(--gold); }
+  .bid-pts { font-size: 11px; font-weight: 600; color: var(--muted); }
+  @keyframes slideInLeft { from { opacity:0; transform: translateX(-16px); } to { opacity:1; transform:translateX(0); } }
+
+  /* ── Centre Stage ── */
+  .stage {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 20px 32px;
+    gap: 16px;
+    position: relative;
+    background: var(--bg);
+  }
+
+  /* Player card */
+  .player-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: var(--shadow-lg);
+    padding: 28px 32px 22px;
+    width: 100%; max-width: 540px;
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center;
+    position: relative;
+    animation: cardIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275);
+  }
+  @keyframes cardIn {
+    from { opacity:0; transform: scale(0.88) translateY(20px); }
+    to   { opacity:1; transform: scale(1) translateY(0); }
+  }
+  .player-num-badge {
+    position: absolute; top: 14px; left: 18px;
+    font-size: 11px; color: var(--muted); font-weight: 600;
+    background: #f1f5f9; padding: 3px 10px; border-radius: 20px;
+    border: 1px solid var(--border);
+  }
+  .player-avatar {
+    width: 96px; height: 96px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 34px; font-weight: 900; color: #fff;
+    border: 4px solid var(--white);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    margin-bottom: 16px; flex-shrink: 0;
+  }
+  .player-name {
+    font-family: 'Oswald', sans-serif;
+    font-size: 44px; font-weight: 700;
+    color: var(--text); line-height: 1.05;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+  }
+  .player-badges {
+    display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 14px;
+  }
+  .badge {
+    font-size: 12px; font-weight: 600;
+    padding: 4px 14px; border-radius: 20px;
+    background: #f1f5f9; border: 1px solid var(--border);
+    color: #334155;
+  }
+  .badge-dept { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
+  .badge-loc  { background: #f0fdf4; border-color: #bbf7d0; color: #15803d; }
+  .player-base {
+    font-size: 13px; color: var(--muted); font-weight: 600;
+    letter-spacing: 1px;
+  }
+  .player-base span { color: var(--text); }
+
+  /* Bid display — BELOW card, prominent */
+  .bid-display {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 18px 32px;
+    width: 100%; max-width: 540px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .bid-display-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 4px;
+  }
+  .bid-display-value {
+    font-family: 'Oswald', sans-serif;
+    font-size: 80px; font-weight: 700; line-height: 1;
+    color: var(--red);
+  }
+  .bid-display-value.flash { animation: bidFlash 0.35s ease; }
+  @keyframes bidFlash {
+    0%   { transform: scale(1); }
+    35%  { transform: scale(1.12); color: #ff0000; }
+    100% { transform: scale(1); color: var(--red); }
+  }
+  .bid-display-pts { font-size: 22px; color: var(--muted); margin-left: 4px; }
+  .bid-leader {
+    font-size: 26px; font-weight: 800;
+    color: var(--green); margin-top: 4px; min-height: 32px;
+  }
+  .bid-leader.empty { font-size: 16px; color: var(--muted); font-weight: 500; font-style: italic; }
+
+  /* Sold / Unsold banner — BELOW bid display, no overlap */
+  .result-banner {
+    width: 100%; max-width: 540px;
+    border-radius: 14px;
+    padding: 16px 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px;
+    animation: bannerIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+  }
+  @keyframes bannerIn { from { opacity:0; transform: translateY(16px) scale(0.96); } to { opacity:1; transform:none; } }
+  .result-banner.sold-banner {
+    background: #f0fdf4; border: 2px solid #86efac;
+  }
+  .result-banner.unsold-banner {
+    background: #f8fafc; border: 2px solid #cbd5e1;
+  }
+  .result-stamp {
+    font-family: 'Oswald', sans-serif;
+    font-size: 36px; font-weight: 700;
+    letter-spacing: 3px;
+  }
+  .result-stamp.sold  { color: var(--green); }
+  .result-stamp.unsold { color: var(--muted); }
+  .result-detail { text-align: left; }
+  .result-to   { font-size: 13px; color: var(--muted); }
+  .result-who  { font-size: 22px; font-weight: 800; color: var(--text); }
+  .result-price { font-size: 15px; color: var(--gold); font-weight: 700; }
+  .result-next { text-align: center; }
+  .next-label  { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; }
+  .next-count  { font-family: 'Oswald', sans-serif; font-size: 48px; font-weight: 700; color: var(--red); line-height: 1; }
+
+  /* ── Timer Panel ── */
+  .timer-section { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .timer-ring {
+    position: relative; width: 170px; height: 170px;
+  }
+  .timer-ring svg { transform: rotate(-90deg); }
+  .timer-ring .track  { fill: none; stroke: #e2e8f0; stroke-width: 10; }
+  .timer-ring .arc    { fill: none; stroke-width: 10; stroke-linecap: round; stroke-dasharray: 440; transition: stroke-dashoffset 0.9s linear, stroke 0.3s; }
+  .timer-num {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Oswald', sans-serif; font-size: 60px; font-weight: 700; color: var(--text);
+  }
+  .timer-ring.warn  .timer-num { color: #b45309; }
+  .timer-ring.danger .timer-num { color: var(--red); animation: tpulse 0.5s ease infinite alternate; }
+  @keyframes tpulse { from { transform: scale(1); } to { transform: scale(1.08); } }
+
+  /* Owners in timer panel */
+  .owner-chips { width: 100%; display: flex; flex-direction: column; gap: 7px; margin-top: 4px; }
+  .owner-chip {
+    background: #f8fafc; border: 1px solid var(--border);
+    border-radius: 10px; padding: 8px 12px;
+  }
+  .owner-chip.leading { background: #fffbeb; border-color: #fde68a; }
+  .oc-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+  .oc-name { font-size: 12px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 6px; }
+  .oc-budget { font-size: 13px; font-weight: 800; color: var(--gold); }
+  .oc-bar { height: 4px; background: #e2e8f0; border-radius: 2px; overflow: hidden; }
+  .oc-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .dot-on  { background: var(--greenl); box-shadow: 0 0 6px var(--greenl); }
+  .dot-off { background: #cbd5e1; }
+
+  /* ── Bottom owners bar ── */
+  .owners-bar {
+    display: flex; gap: 8px; padding: 10px 20px;
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
+    flex-shrink: 0; overflow-x: auto;
+  }
+  .ob { flex: 1; min-width: 90px; background: #f8fafc; border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; text-align: center; }
+  .ob.leading { background: #fffbeb; border-color: #fde68a; }
+  .ob-name   { font-size: 11px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ob-budget { font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 700; color: var(--gold); line-height: 1.2; }
+  .ob-pts    { font-size: 9px; color: var(--muted); }
+  .ob-squad  { font-size: 10px; color: var(--muted); margin-top: 1px; }
+  .ob-bar    { height: 3px; background: #e2e8f0; border-radius: 2px; margin-top: 5px; overflow: hidden; }
+  .ob-fill   { height: 100%; border-radius: 2px; transition: width 0.5s; }
+
+  /* ── Waiting overlay ── */
+  .waiting {
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(240,244,248,0.97);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 16px;
+    text-align: center;
+  }
+  .waiting-badge {
+    width: 80px; height: 80px; border-radius: 20px;
+    background: var(--red);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Oswald', sans-serif; font-size: 28px; font-weight: 700;
+    color: #fff; letter-spacing: 1px;
+    box-shadow: 0 8px 32px rgba(217,35,45,0.3);
+  }
+  .waiting-title { font-family: 'Oswald', sans-serif; font-size: 52px; font-weight: 700; color: var(--text); letter-spacing: 3px; }
+  .waiting-sub   { font-size: 16px; color: var(--muted); letter-spacing: 1px; }
+
+  /* Finished overlay */
+  .finished {
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(240,244,248,0.97);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 12px;
+    text-align: center;
+  }
+
+  /* Confetti */
+  .confetti-piece {
+    position: fixed; animation: cfFall 3s ease-in forwards; pointer-events: none;
+  }
+  @keyframes cfFall {
+    0%   { transform: translateY(-10px) rotate(0); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo-wrap">
+    <div class="logo-badge">MPL</div>
+    <div>
+      <div class="logo-title">MPL E-BIDDING</div>
+      <div class="logo-sub">Moglix Premier League · Live Auction</div>
+    </div>
+  </div>
+  <div class="header-stats">
+    <div class="hstat"><div class="hstat-val" id="hPlayed">0</div><div class="hstat-lbl">Played</div></div>
+    <div class="hstat"><div class="hstat-val" id="hRemain">—</div><div class="hstat-lbl">Remaining</div></div>
+    <div class="hstat"><div class="hstat-val" id="hSold">0</div><div class="hstat-lbl">Sold</div></div>
+  </div>
+</div>
+
+<!-- Main grid -->
+<div class="main">
+
+  <!-- Bid History -->
+  <div class="panel">
+    <div class="panel-title">Bid History</div>
+    <div id="bidLog"></div>
+  </div>
+
+  <!-- Centre Stage -->
+  <div class="stage" id="stage">
+
+    <!-- Player card -->
+    <div class="player-card" id="playerCard">
+      <div class="player-num-badge" id="playerNum"></div>
+      <div class="player-avatar" id="playerAvatar"></div>
+      <div class="player-name" id="playerName">—</div>
+      <div class="player-badges" id="playerBadges"></div>
+      <div class="player-base">Base Price: <span id="playerBase">—</span> pts</div>
+    </div>
+
+    <!-- Bid display (below card, not overlapping) -->
+    <div class="bid-display" id="bidDisplay">
+      <div class="bid-display-label">Current Bid</div>
+      <div class="bid-display-value" id="bidValue">—</div>
+      <div class="bid-leader empty" id="bidLeader">Waiting for first bid…</div>
+    </div>
+
+    <!-- Result banner (sold/unsold) — appears below bid display -->
+    <div class="result-banner sold-banner hidden" id="bannerSold">
+      <div class="result-stamp sold">SOLD!</div>
+      <div class="result-detail">
+        <div class="result-to">Won by</div>
+        <div class="result-who" id="soldWho">—</div>
+        <div class="result-price" id="soldFor">—</div>
+      </div>
+      <div class="result-next">
+        <div class="next-label">Next player in</div>
+        <div class="next-count" id="nextCountSold">—</div>
+      </div>
+    </div>
+
+    <div class="result-banner unsold-banner hidden" id="bannerUnsold">
+      <div class="result-stamp unsold">UNSOLD</div>
+      <div class="result-detail">
+        <div class="result-to" style="font-size:15px;color:#64748b">No bids received — player pushed to end</div>
+      </div>
+      <div class="result-next">
+        <div class="next-label">Next player in</div>
+        <div class="next-count" id="nextCountUnsold">—</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Timer + Owners -->
+  <div class="panel panel-right">
+    <div class="panel-title">Time Remaining</div>
+    <div class="timer-section">
+      <div class="timer-ring" id="timerRing">
+        <svg width="170" height="170" viewBox="0 0 170 170">
+          <circle class="track" cx="85" cy="85" r="70" />
+          <circle class="arc" id="timerArc" cx="85" cy="85" r="70" stroke="#22c55e" stroke-dashoffset="0" />
+        </svg>
+        <div class="timer-num" id="timerNum">20</div>
+      </div>
+    </div>
+    <div class="panel-title" style="margin-top:12px">Owners</div>
+    <div class="owner-chips" id="ownerChips"></div>
+  </div>
+
+</div>
+
+<!-- Bottom owners bar -->
+<div class="owners-bar" id="ownersBar"></div>
+
+<!-- Waiting overlay -->
+<div class="waiting" id="overlayWaiting">
+  <div class="waiting-badge">MPL</div>
+  <div class="waiting-title">MPL E-BIDDING</div>
+  <div class="waiting-sub" id="waitMsg">Waiting for auction to start…</div>
+</div>
+
+<!-- Finished overlay -->
+<div class="finished hidden" id="overlayFinished">
+  <div class="waiting-badge" style="font-size:36px">🏁</div>
+  <div class="waiting-title">AUCTION COMPLETE</div>
+  <div class="waiting-sub" id="finMsg">All players have been auctioned</div>
+</div>
+
+<script>
+const socket = io();
+let prevPhase = '';
+
+const AVATAR_COLORS = [
+  ['#7c3aed','#a78bfa'], ['#0284c7','#7dd3fc'], ['#059669','#6ee7b7'],
+  ['#d97706','#fcd34d'], ['#dc2626','#fca5a5'], ['#7e22ce','#d8b4fe'],
+  ['#0369a1','#93c5fd'], ['#15803d','#86efac'], ['#b45309','#fde68a'],
+  ['#be185d','#f9a8d4'],
+];
+const BAR_COLORS = ['#7c3aed','#0284c7','#059669','#d97706','#dc2626','#7e22ce','#0369a1','#15803d','#b45309','#be185d'];
+
+function initials(name) { return name.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase(); }
+function avatarColor(name, idx) {
+  const i = idx !== undefined ? idx % AVATAR_COLORS.length : name.charCodeAt(0) % AVATAR_COLORS.length;
+  return AVATAR_COLORS[i];
+}
+
+socket.on('state', (s) => {
+  render(s);
+  prevPhase = s.phase;
+});
+
+socket.on('bid:flash', () => {
+  const el = document.getElementById('bidValue');
+  el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+  el.addEventListener('animationend', () => el.classList.remove('flash'), { once: true });
+});
+
+function render(s) {
+  // Header
+  const played = s.currentIndex >= 0 ? s.currentIndex + 1 : 0;
+  document.getElementById('hPlayed').textContent = played;
+  document.getElementById('hRemain').textContent = s.totalPlayers > 0 ? Math.max(0, s.totalPlayers - played) : '—';
+  document.getElementById('hSold').textContent = s.soldLog.length;
+
+  const ow = document.getElementById('overlayWaiting');
+  const of = document.getElementById('overlayFinished');
+  const bSold   = document.getElementById('bannerSold');
+  const bUnsold = document.getElementById('bannerUnsold');
+
+  // Waiting overlay
+  if (['setup','ready','paused'].includes(s.phase)) {
+    ow.classList.remove('hidden');
+    of.classList.add('hidden');
+    const msgs = { setup: 'Admin is setting up the auction…', ready: `${s.totalPlayers} players ready. Waiting to start…`, paused: '⏸  Auction paused by admin' };
+    document.getElementById('waitMsg').textContent = msgs[s.phase] || '';
+  } else if (s.phase === 'finished') {
+    ow.classList.add('hidden');
+    of.classList.remove('hidden');
+    document.getElementById('finMsg').textContent = `${s.soldLog.length} players sold out of ${s.totalPlayers}`;
+  } else {
+    ow.classList.add('hidden');
+    of.classList.add('hidden');
+  }
+
+  // Result banners (sold/unsold) — shown below bid display, no overlay
+  if (s.phase === 'sold') {
+    bSold.classList.remove('hidden');
+    bUnsold.classList.add('hidden');
+    document.getElementById('soldWho').textContent  = s.leaderName || '—';
+    document.getElementById('soldFor').textContent  = `for ${s.currentBid} pts`;
+    document.getElementById('nextCountSold').textContent = s.nextIn > 0 ? s.nextIn : '…';
+    if (prevPhase !== 'sold') launchConfetti();
+  } else if (s.phase === 'unsold') {
+    bUnsold.classList.remove('hidden');
+    bSold.classList.add('hidden');
+    document.getElementById('nextCountUnsold').textContent = s.nextIn > 0 ? s.nextIn : '…';
+  } else {
+    bSold.classList.add('hidden');
+    bUnsold.classList.add('hidden');
+  }
+
+  // Player card
+  if (s.currentPlayer) {
+    const [bg, lt] = avatarColor(s.currentPlayer.name);
+    const av = document.getElementById('playerAvatar');
+    av.style.background = `linear-gradient(135deg, ${bg}, ${lt})`;
+    av.textContent = initials(s.currentPlayer.name);
+
+    document.getElementById('playerNum').textContent = `Player ${s.currentIndex + 1} of ${s.totalPlayers}`;
+    document.getElementById('playerName').textContent = s.currentPlayer.name;
+
+    const badges = document.getElementById('playerBadges');
+    badges.innerHTML = '';
+    if (s.currentPlayer.department) badges.innerHTML += `<span class="badge badge-dept">${s.currentPlayer.department}</span>`;
+    if (s.currentPlayer.designation) badges.innerHTML += `<span class="badge">${s.currentPlayer.designation}</span>`;
+    if (s.currentPlayer.location) badges.innerHTML += `<span class="badge badge-loc">📍 ${s.currentPlayer.location}</span>`;
+    document.getElementById('playerBase').textContent = s.currentPlayer.base_price || 1;
+
+    // Bid value
+    const bv = document.getElementById('bidValue');
+    if (s.currentBid > 0) {
+      bv.innerHTML = `${s.currentBid}<span class="bid-display-pts"> pts</span>`;
+    } else {
+      bv.innerHTML = `<span style="font-size:32px;color:#94a3b8">No bids yet</span>`;
+    }
+
+    const bl = document.getElementById('bidLeader');
+    if (s.leaderName) {
+      bl.textContent = `🏆  ${s.leaderName}`;
+      bl.classList.remove('empty');
+    } else {
+      bl.textContent = 'Waiting for first bid…';
+      bl.classList.add('empty');
+    }
+  }
+
+  // Timer
+  const t = Math.max(0, s.timer);
+  const maxT = 30; // visual max for arc (caps display at full circle)
+  const circ = 440;
+  const offset = circ - Math.min(t / maxT, 1) * circ;
+  const arc = document.getElementById('timerArc');
+  const ring = document.getElementById('timerRing');
+  const num  = document.getElementById('timerNum');
+
+  arc.style.strokeDashoffset = offset;
+  ring.classList.remove('warn','danger');
+  if (s.phase === 'bidding') {
+    num.textContent = t;
+    if (t <= 5) { arc.style.stroke = '#D9232D'; ring.classList.add('danger'); }
+    else if (t <= 10) { arc.style.stroke = '#d97706'; ring.classList.add('warn'); }
+    else { arc.style.stroke = '#22c55e'; }
+  } else {
+    num.textContent = '—';
+    arc.style.stroke = '#e2e8f0';
+    arc.style.strokeDashoffset = circ;
+  }
+
+  // Side owner chips
+  const oc = document.getElementById('ownerChips');
+  oc.innerHTML = '';
+  s.owners.forEach((o, i) => {
+    const pct = o.budget;
+    const color = BAR_COLORS[i % BAR_COLORS.length];
+    oc.innerHTML += `
+      <div class="owner-chip ${o.id === s.leaderId ? 'leading' : ''}">
+        <div class="oc-row">
+          <span class="oc-name"><span class="dot ${o.connected ? 'dot-on' : 'dot-off'}"></span>${o.name}</span>
+          <span class="oc-budget">${o.budget}<span style="font-size:10px;font-weight:600;color:#94a3b8"> pts</span></span>
+        </div>
+        <div class="oc-bar"><div class="oc-fill" style="width:${pct}%;background:${color}"></div></div>
+      </div>`;
+  });
+
+  // Bottom bar
+  const ob = document.getElementById('ownersBar');
+  ob.innerHTML = '';
+  s.owners.forEach((o, i) => {
+    const color = BAR_COLORS[i % BAR_COLORS.length];
+    ob.innerHTML += `
+      <div class="ob ${o.id === s.leaderId ? 'leading' : ''}">
+        <div class="ob-name">${o.name}</div>
+        <div class="ob-budget">${o.budget}<span class="ob-pts"> pts</span></div>
+        <div class="ob-squad">${o.squad.length} player${o.squad.length !== 1 ? 's' : ''}</div>
+        <div class="ob-bar"><div class="ob-fill" style="width:${o.budget}%;background:${color}"></div></div>
+      </div>`;
+  });
+
+  // Bid log
+  const bl2 = document.getElementById('bidLog');
+  bl2.innerHTML = '';
+  s.bidLog.forEach((b, i) => {
+    bl2.innerHTML += `
+      <div class="bid-item">
+        <div>
+          <div class="bid-rank">#${i + 1}</div>
+          <div class="bid-owner-name">${b.ownerName}</div>
+        </div>
+        <div>
+          <span class="bid-amt">${b.amount}</span>
+          <span class="bid-pts"> pts</span>
+        </div>
+      </div>`;
+  });
+}
+
+function launchConfetti() {
+  const colors = ['#D9232D','#F5A623','#22c55e','#3b82f6','#a855f7','#0891b2'];
+  for (let i = 0; i < 70; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.cssText = `
+      left:${Math.random()*100}vw; top:-10px;
+      width:${6+Math.random()*10}px; height:${6+Math.random()*10}px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      border-radius:${Math.random()>0.5?'50%':'2px'};
+      animation-delay:${Math.random()*1.2}s;
+      animation-duration:${2+Math.random()*2}s;`;
+    document.body.appendChild(el);
+    el.addEventListener('animationend', () => el.remove());
+  }
+}
+</script>
+</body>
+</html>

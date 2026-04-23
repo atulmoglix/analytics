@@ -1,0 +1,17 @@
+{
+  "name": "mpl-ebidding",
+  "version": "1.0.0",
+  "description": "MPL E-Bidding — Real-time employee auction platform",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
