@@ -9,3 +9,16 @@ desktop.ini
 
 # Logs
 *.log
+
+# Python virtual environment
+.venv/
+__pycache__/
+*.pyc
+
+# Local SQLite databases
+*.db
+*.sqlite3
+
+# Temp files
+temp_pdfs/
+

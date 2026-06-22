@@ -1,21 +1,21 @@
 player_id,name,department,designation,location,years_exp,skills,base_price
-P001,Aarav Sharma,Supply Chain,Senior Manager,Delhi,8,"Procurement, Vendor Management, SAP",15
-P002,Priya Mehta,Finance,Financial Analyst,Mumbai,5,"FP&A, Excel, Power BI",8
-P003,Rohit Verma,Technology,Software Engineer,Bangalore,4,"Python, SQL, APIs",10
-P004,Sneha Iyer,Marketing,Brand Manager,Mumbai,6,"Digital Marketing, SEO, Analytics",12
-P005,Arjun Nair,Operations,Operations Lead,Pune,7,"Process Improvement, Lean, Six Sigma",14
-P006,Kavya Reddy,HR,HR Business Partner,Hyderabad,5,"Talent Acquisition, L&D, HRIS",8
-P007,Vikram Singh,Sales,Regional Sales Head,Delhi,10,"B2B Sales, CRM, Key Accounts",18
-P008,Ananya Joshi,Product,Product Manager,Bangalore,6,"Roadmapping, Agile, User Research",13
-P009,Manish Gupta,Finance,CFO Office Analyst,Mumbai,4,"Financial Modelling, Budgeting, MIS",7
-P010,Pooja Nambiar,Technology,Data Engineer,Bangalore,3,"Spark, Kafka, dbt, Snowflake",9
-P011,Suresh Kumar,Supply Chain,Procurement Head,Chennai,12,"Strategic Sourcing, Contracts, ERP",20
-P012,Ritu Agarwal,Marketing,Performance Marketing Lead,Gurgaon,5,"Paid Media, Google Ads, Attribution",11
-P013,Aditya Bose,Technology,Backend Engineer,Hyderabad,5,"Java, Microservices, AWS",10
-P014,Divya Pillai,Operations,Logistics Manager,Mumbai,8,"3PL, Last Mile, Fleet Management",15
-P015,Karan Malhotra,Sales,Enterprise Sales Manager,Delhi,9,"SaaS Sales, BANT, Salesforce",16
-P016,Simran Kaur,HR,Talent Acquisition Lead,Gurgaon,6,"Niche Hiring, EVP, LinkedIn",10
-P017,Nikhil Mehta,Finance,Treasury Analyst,Mumbai,4,"Cash Flow, FX, Investments",8
-P018,Deepa Krishnan,Product,UX Designer,Bangalore,5,"Figma, Design Systems, Research",9
-P019,Rajesh Patel,Technology,DevOps Engineer,Pune,6,"Kubernetes, CI/CD, Terraform",12
-P020,Neha Sharma,Supply Chain,Category Manager,Delhi,7,"Category Strategy, Negotiation, P&L",13
+P001,Md Ramiz,Analytics,Intern,Noida,3,"Sharp fileder, explosive batter",15
+P002,Chhavi Ream,Analytics,Lead,Noida,5,"Opener batter, Only 6 hitter",8
+P003,Avanish Kumar,Analytics,Lead,Noida,7,"Farrat bowler, psycho batter",10
+P004,Tanishk Kumar,Analytics,Analyst,Noida,6,"Jhonty rhodes, flying fauji",12
+P005,Atul Rai,Analytics,Lead,Noida,9,"Deceptive bowler, Jadugar",14
+P006,Bhavesh Khandelwal,Analytics,Super Lead,Noida,10,"Kaptaan, only century.",20
+P007,Amit Kumar,Tech,Intern,Noida,3,"Sharp fileder, explosive batter",15
+P008,Akansh Kohli,Infra,Lead,Noida,5,"Opener batter, Only 6 hitter",8
+P009,Suneel Murya,ERP,Lead,Noida,7,"Farrat bowler, psycho batter",10
+P010,Amit Sagar,Admin,Analyst,Noida,6,"Jhonty rhodes, flying fauji",12
+P011,Ashish Awasthi,Credlix,Lead,Noida,9,"Deceptive bowler, Jadugar",14
+P012,Narender,Finance,Super Lead,Noida,10,"Kaptaan, only century.",20
+P013,Prashant,Paas,Intern,Noida,3,"Sharp fileder, explosive batter",15
+P014,Vaibhav Singhal,Jeera,Lead,Noida,5,"Opener batter, Only 6 hitter",8
+P015,Mohnish Vohra,Tech,Lead,Noida,7,"Farrat bowler, psycho batter",10
+P016,Nitesh Gupta,ERP,Analyst,Noida,6,"Jhonty rhodes, flying fauji",12
+P017,Saurabh,Admin,Lead,Noida,9,"Deceptive bowler, Jadugar",14
+P018,Sagar Singh,Analytics,Super Lead,Noida,10,"Kaptaan, only century.",20
+P019,Vishal Saini,CRM,Lead,Noida,5,"Opener batter, Only 6 hitter",8
+P020,Abhishek,Devops,Lead,Noida,7,"Farrat bowler, psycho batter",10

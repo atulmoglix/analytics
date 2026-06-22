@@ -176,6 +176,7 @@ header{
 .proj-card.gold-card::before{background:linear-gradient(90deg,var(--gold),var(--gold-light))}
 .proj-card.purple-card::before{background:linear-gradient(90deg,#7C3AED,#A78BFA)}
 .proj-card.orange-card::before{background:linear-gradient(90deg,#EA580C,#F97316)}
+.proj-card.teal-card::before{background:linear-gradient(90deg,#0D9488,#14B8A6)}
 .proj-card:hover::before{opacity:1;height:3px}
 
 .proj-card-glow{
@@ -188,6 +189,7 @@ header{
 .blue-card .proj-card-glow{background:radial-gradient(circle,rgba(59,130,246,.1),transparent 70%)}
 .gold-card .proj-card-glow{background:radial-gradient(circle,rgba(201,162,39,.12),transparent 70%)}
 .orange-card .proj-card-glow{background:radial-gradient(circle,rgba(234,88,12,.12),transparent 70%)}
+.teal-card .proj-card-glow{background:radial-gradient(circle,rgba(13,148,136,.12),transparent 70%)}
 .proj-card:hover .proj-card-glow{opacity:1}
 
 .proj-num{
@@ -197,6 +199,7 @@ header{
 .red-card .proj-num{color:var(--red)}
 .blue-card .proj-num{color:#3B82F6}
 .gold-card .proj-num{color:var(--gold)}
+.teal-card .proj-num{color:#0D9488}
 .proj-status{
   font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;
   background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.2);
@@ -212,6 +215,7 @@ header{
 .blue-card .proj-icon{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2)}
 .gold-card .proj-icon{background:rgba(201,162,39,.1);border:1px solid rgba(201,162,39,.2)}
 .orange-card .proj-icon{background:rgba(234,88,12,.1);border:1px solid rgba(234,88,12,.2)}
+.teal-card .proj-icon{background:rgba(13,148,136,.1);border:1px solid rgba(13,148,136,.2)}
 
 .proj-name{font-size:22px;font-weight:800;margin-bottom:6px;line-height:1.2}
 .proj-tagline{font-size:13px;color:rgba(255,255,255,.6);margin-bottom:18px;font-weight:400}
@@ -260,6 +264,7 @@ header{
 .red-card:hover .proj-launch{color:var(--red)}
 .blue-card:hover .proj-launch{color:#3B82F6}
 .gold-card:hover .proj-launch{color:var(--gold)}
+.teal-card:hover .proj-launch{color:#0D9488}
 .orange-card .proj-num{color:#EA580C}
 
 /* Multi-link grid for event cards */
@@ -351,6 +356,7 @@ footer{
 .proj-card:nth-child(3){animation:fadeUp .5s .3s ease both}
 .proj-card:nth-child(4){animation:fadeUp .5s .4s ease both}
 .proj-card:nth-child(5){animation:fadeUp .5s .5s ease both}
+.proj-card:nth-child(6){animation:fadeUp .5s .6s ease both}
 </style>
 </head>
 <body>
@@ -365,7 +371,7 @@ footer{
     </div>
   </div>
   <div class="header-right">
-    <div class="header-tag">&#9679; 5 Projects</div>
+    <div class="header-tag">&#9679; 6 Projects</div>
     <a class="ar-pill" href="#" title="Built by Atul Rai">
       <div class="ar-mono">AR</div>
       <span class="ar-label">Atul Rai &middot; Data &amp; Analytics</span>
@@ -387,7 +393,7 @@ footer{
   <div class="hero-divider"></div>
   <div class="hero-stats">
     <div class="hero-stat">
-      <div class="hs-val">5<span>+</span></div>
+      <div class="hs-val">6<span>+</span></div>
       <div class="hs-label">Tools Built</div>
     </div>
     <div class="hero-stat">
@@ -589,25 +595,25 @@ footer{
         <span class="feat-chip">Next-player Countdown</span>
       </div>
       <div class="proj-links">
-        <div class="proj-server-note">&#9654; cd mpl-ebidding &amp;&amp; npm start &nbsp;&#8594;&nbsp; http://11.1.9.104:3000</div>
-        <a class="proj-link-btn full" href="http://11.1.9.104:3000/admin.html" target="_blank">
+        <div class="proj-server-note">&#9654; cd mpl-ebidding &amp;&amp; npm start &nbsp;&#8594;&nbsp; http://localhost:3000</div>
+        <a class="proj-link-btn full" href="http://localhost:3000/admin.html" target="_blank">
           &#9881; Admin Panel &mdash; Configure owners &amp; control auction
           <span class="proj-link-icon">&#8599;</span>
         </a>
-        <a class="proj-link-btn full" href="http://11.1.9.104:3000/display.html" target="_blank">
+        <a class="proj-link-btn full" href="http://localhost:3000/display.html" target="_blank">
           &#128250; Live Auction Display &mdash; Put this on the projector
           <span class="proj-link-icon">&#8599;</span>
         </a>
-        <a class="proj-link-btn" href="http://11.1.9.104:3000/owner/owner_1" target="_blank">
+        <a class="proj-link-btn" href="http://localhost:3000/owner/owner_1" target="_blank">
           &#128100; Owner 1 Bid Panel <span class="proj-link-icon">&#8599;</span>
         </a>
-        <a class="proj-link-btn" href="http://11.1.9.104:3000/owner/owner_2" target="_blank">
+        <a class="proj-link-btn" href="http://localhost:3000/owner/owner_2" target="_blank">
           &#128100; Owner 2 Bid Panel <span class="proj-link-icon">&#8599;</span>
         </a>
-        <a class="proj-link-btn" href="http://11.1.9.104:3000/owner/owner_3" target="_blank">
+        <a class="proj-link-btn" href="http://localhost:3000/owner/owner_3" target="_blank">
           &#128100; Owner 3 Bid Panel <span class="proj-link-icon">&#8599;</span>
         </a>
-        <a class="proj-link-btn" href="http://11.1.9.104:3000/owner/owner_4" target="_blank">
+        <a class="proj-link-btn" href="http://localhost:3000/owner/owner_4" target="_blank">
           &#128100; Owner 4 Bid Panel <span class="proj-link-icon">&#8599;</span>
         </a>
         <a class="proj-link-btn csv-btn full" href="mpl-ebidding/sample-players.csv" download>
@@ -616,6 +622,43 @@ footer{
         </a>
       </div>
     </div>
+
+    <!-- Card 6: Manual Invoicing Form -->
+    <a class="proj-card teal-card" href="manual-invoicing-form/frontend/index.html" target="_blank">
+      <div class="proj-card-glow"></div>
+      <div class="proj-num">
+        06 &mdash; Finance
+        <span class="proj-status">POC &middot; FastAPI</span>
+      </div>
+      <div class="proj-icon">&#128203;</div>
+      <div class="proj-name">Manual Invoices</div>
+      <div class="proj-tagline">Manual Invoice, CN, &amp; DN Form Portal</div>
+      <p class="proj-desc">
+        A premium financial document portal for generating Manual Invoices, Credit Notes (CN), 
+        and Debit Notes (DN). Validates inputs based on business criteria, runs math equations 
+        interactively, handles database logging in SQLite, and exports print-ready ReportLab PDFs.
+      </p>
+      <div class="proj-features">
+        <span class="feat-chip">FastAPI Backend</span>
+        <span class="feat-chip">SQLite DB Logs</span>
+        <span class="feat-chip">Dynamic Tabs Routing</span>
+        <span class="feat-chip">18% GST Auto-Calc</span>
+        <span class="feat-chip">ReportLab PDF Export</span>
+        <span class="feat-chip">Light/Dark Mode</span>
+      </div>
+      <div class="ai-highlight">
+        <div class="ai-label">AI Features</div>
+        <div class="ai-feat">
+          Auto-compute CGST/SGST splits &middot;
+          Format print-ready custom financial summary PDFs &middot;
+          Pre-seed sample records on startup
+        </div>
+      </div>
+      <div class="proj-launch">
+        Launch Invoicing Portal
+        <span class="launch-arrow">&#8599;</span>
+      </div>
+    </a>
 
   </div>
 </div>
