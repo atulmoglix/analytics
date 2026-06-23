@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moglix - Manual Invoicing Portal</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-container">
+                        <img src="assets/moglix-logo.png" alt="Moglix Enterprise" class="logo-img">
+                    </div>
+                    <span class="logo-subtext">Finance</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <button class="nav-btn active" data-tab="dashboard" id="btn-tab-dashboard">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+                    Dashboard
+                </button>
+                <div class="nav-section-title">Operations</div>
+                <button class="nav-btn" data-tab="create-invoice" id="btn-tab-invoice">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    Manual Invoice
+                </button>
+                <button class="nav-btn" data-tab="create-cn" id="btn-tab-cn">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                    Credit Note (CN)
+                </button>
+                <button class="nav-btn" data-tab="create-dn" id="btn-tab-dn">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                    Debit Note (DN)
+                </button>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Theme">
+                    <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                    <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    <span class="theme-toggle-text">Toggle Theme</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header Bar -->
+            <header class="content-header">
+                <h1 id="page-title">Dashboard</h1>
+                <h2 class="portal-main-title">Manual Invoicing Form</h2>
+                <div class="user-profile">
+                    <div class="avatar">AR</div>
+                    <div class="user-info">
+                        <span class="username">Atul Rai</span>
+                        <span class="role">Finance Operations</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dynamic Tab Content Views -->
+            <div class="tab-viewport">
+                
+                <!-- 1. DASHBOARD VIEW -->
+                <section id="tab-dashboard" class="tab-pane active">
+                    <!-- Dashboard Stats Grid -->
+                    <div class="stats-grid">
+                        <div class="stat-card total-invoices">
+                            <div class="stat-header">
+                                <span class="stat-title">Invoices</span>
+                                <div class="stat-badge invoice-badge">INV</div>
+                            </div>
+                            <div class="stat-value" id="stat-invoice-count">0</div>
+                            <div class="stat-footer">Total active invoices</div>
+                        </div>
+                        <div class="stat-card total-cns">
+                            <div class="stat-header">
+                                <span class="stat-title">Credit Notes</span>
+                                <div class="stat-badge cn-badge">CN</div>
+                            </div>
+                            <div class="stat-value" id="stat-cn-count">0</div>
+                            <div class="stat-footer">Total returned values</div>
+                        </div>
+                        <div class="stat-card total-dns">
+                            <div class="stat-header">
+                                <span class="stat-title">Debit Notes</span>
+                                <div class="stat-badge dn-badge">DN</div>
+                            </div>
+                            <div class="stat-value" id="stat-dn-count">0</div>
+                            <div class="stat-footer">Total adjusted values</div>
+                        </div>
+                    </div>
+
+                    <!-- Documents List Card -->
+                    <div class="content-card list-card">
+                        <div class="card-header">
+                            <h2>Recent Financial Documents</h2>
+                            <div class="filters">
+                                <select id="filter-doc-type" class="custom-select">
+                                    <option value="">All Document Types</option>
+                                    <option value="invoice">Invoices</option>
+                                    <option value="credit_note">Credit Notes</option>
+                                    <option value="debit_note">Debit Notes</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table" id="documents-table">
+                                <thead>
+                                    <tr>
+                                        <th>Doc Type</th>
+                                        <th>Ref Invoice</th>
+                                        <th>Doc Date / Return Date</th>
+                                        <th>Doc/Note No</th>
+                                        <th>Company / Plant</th>
+                                        <th>Value / Return Sales</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="documents-tbody">
+                                    <!-- Dynamic rows loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. CREATE MANUAL INVOICE VIEW -->
+                <section id="tab-create-invoice" class="tab-pane">
+                    <div class="content-card form-card">
+                        <div class="card-header border-bottom">
+                            <h2>Create Manual Invoice</h2>
+                            <span class="required-notice">* Indicates mandatory field</span>
+                        </div>
+                        <form id="form-invoice" class="document-form">
+                            <!-- Field Sections -->
+                            
+                            <!-- A. Identity fields -->
+                            <div class="form-section">
+                                <h3 class="section-title">A. Identity Fields</h3>
+                                <div class="grid-3">
+                                    <div class="form-group required">
+                                        <label for="inv-sale-type">Sale Type</label>
+                                        <select id="inv-sale-type" class="form-input" required>
+                                            <option value="">Select Sale Type</option>
+                                            <option value="Manual">Manual</option>
+                                            <option value="Interest">Interest</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- B. Grain fields -->
+                            <div class="form-section">
+                                <h3 class="section-title">B. Grain Fields</h3>
+                                <div class="grid-2">
+                                    <div class="form-group required">
+                                        <label for="inv-invoice-number">Invoice Number</label>
+                                        <input type="text" id="inv-invoice-number" class="form-input" placeholder="e.g. INV-2026-001" required>
+                                    </div>
+                                    <div class="form-group required">
+                                        <label for="inv-invoice-date">Invoice Date</label>
+                                        <input type="date" id="inv-invoice-date" class="form-input" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- C. Attribute fields -->
+                            <div class="form-section">
+                                <h3 class="section-title">C. Attribute Fields</h3>
+                                <div class="grid-3">
+                                    <div class="form-group required">
+                                        <label for="inv-id-company">ID Company</label>
+                                        <input type="text" id="inv-id-company" class="form-input" placeholder="e.g. MOGLIX-IND" required>
+                                    </div>
+                                    <div class="form-group required">
+                                        <label for="inv-plant-id">Plant ID</label>
+                                        <input type="text" id="inv-plant-id" class="form-input" placeholder="e.g. PL001" required>
+                                    </div>
+                                    <div class="form-group required">
+                                        <label for="inv-plant-name">Plant Name</label>
+                                        <input type="text" id="inv-plant-name" class="form-input" placeholder="e.g. Delhi Warehouse" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- D. Measure fields -->
+                            <div class="form-section">
+                                <h3 class="section-title">D. Measure Fields</h3>
+                                <div class="grid-4">
+                                    <div class="form-group required">
+                                        <label for="inv-value-sp">Value SP (Selling Price)</label>
+                                        <input type="number" id="inv-value-sp" class="form-input math-trigger" placeholder="0.00" step="0.01" required>
+                                    </div>
+                                    <div class="form-group required">
+                                        <label for="inv-sales-wo-tax">Sales Without Tax</label>
+                                        <input type="number" id="inv-sales-wo-tax" class="form-input math-trigger" placeholder="0.00" step="0.01" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="inv-qty">Quantity</label>
+                                        <input type="number" id="inv-qty" class="form-input" placeholder="0" step="1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="inv-tax">Tax Amount</label>
+                                        <div class="input-with-action">
+                                            <input type="number" id="inv-tax" class="form-input" placeholder="0.00" step="0.01">
+                                            <button type="button" class="btn-mini-calc" id="btn-calc-tax-inv" title="Auto calculate 18% GST">18%</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="grid-4 mt-3">
+                                    <div class="form-group">
+                                        <label for="inv-sales-with-tax">Sales With Tax</label>
+                                        <input type="number" id="inv-sales-with-tax" class="form-input" placeholder="0.00" step="0.01">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="inv-gmv">GMV</label>
+                                        <input type="number" id="inv-gmv" class="form-input" placeholder="0.00" step="0.01">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="inv-cogs">COGS</label>
+                                        <input type="number" id="inv-cogs" class="form-input" placeholder="0.00" step="0.01">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="inv-eff-cogs">Effective COGS</label>
+                                        <input type="number" id="inv-eff-cogs" class="form-input" placeholder="0.00" step="0.01">
+                                    </div>
+                                </div>
+                                <div class="grid-3 mt-3">
+                                    <div class="form-group">
+                                        <label for="inv-msn">MSN</label>
+                                        <input type="text" id="inv-msn" class="form-input" placeholder="MSN code">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="inv-supplier-id">Supplier ID</label>
+                                        <input type="text" id="inv-supplier-id" class="form-input" placeholder="SUP-000">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="inv-supplier-name">Supplier Name</label>
+                                        <input type="text" id="inv-supplier-name" class="form-input" placeholder="Name">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="reset" class="btn-secondary">Reset Form</button>
+                                <button type="submit" class="btn-primary">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                                    Save Manual Invoice
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- 3. CREATE MANUAL CREDIT NOTE (CN) VIEW -->
+                <section id="tab-create-cn" class="tab-pane">
+                    <div class="content-card form-card">
+                        <div class="card-header border-bottom">
+                            <h2>Create Manual Credit Note (CN)</h2>
+                            <span class="required-notice">* Indicates mandatory field</span>
+                        </div>
+                        <form id="form-cn" class="document-form">
+                            <!-- A. Identity fields -->
+                            <div class="form-section">
+                                <h3 class="section-title">A. Identity Fields</h3>
+                                <div class="grid-3">
+                                    <div class="form-group required">
+                                        <label for="cn-sale-type">Sale Type</label>
+                                        <select id="cn-sale-type" class="form-input" required>
+                                            <option value="">Select Sale Type</option>
+                                            <option value="Manual">Manual</option>
+                                            <option value="Interest">Interest</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- B. Grain fields -->
+                            <div class="form-section">
+                                <h3 class="section-title">B. Grain Fields</h3>
+                                <div class="grid-3">
+                                    <div class="form-group required">
+                                        <label for="cn-invoice-number">Original Invoice Number</label>
+                                        <input type="text" id="cn-invoice-number" class="form-input" placeholder="INV-2026-000" required>
+                                    </div>
+                                    <div class="form-group required">
+                                        <label for="cn-note-no">CN Note Number</label>
+                                        <input type="text" id="cn-note-no" class="form-input" placeholder="e.g. CN-2026-001" required>
+                                    </div>
+                                    <div class="form-group required">
+                                        <label for="cn-return-date">Return Date</label>
+                                        <input type="date" id="cn-return-date" class="form-input" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- C. Attribute fields -->
+                            <div class="form-section">
+                                <h3 class="section-title">C. Attribute Fields</h3>
+                                <div class="grid-3">
+                                    <div class="form-group required">
+                                        <label for="cn-id-company">ID Company</label>
+                                        <input type="text" id="cn-id-company" class="form-input" placeholder="MOGLIX-IND" required>
+                                    </div>
+                                    <div class="form-group required">
+                                        <label for="cn-plant-id">Plant ID</label>
+                                        <input type="text" id="cn-plant-id" class="form-input" placeholder="PL001" required>
+                                    </div>
+                                    <div class="form-group required">
+                                        <label for="cn-plant-name">Plant Name</label>
+                                        <input type="text" id="cn-plant-name" class="form-input" placeholder="Delhi Warehouse" required>
+                                    </div>
+                                </div>
+                                <div class="grid-1 mt-3">
+                                    <div class="form-group required">
+                                        <label for="cn-return-remark">Return Remark</label>
+                                        <input type="text" id="cn-return-remark" class="form-input" placeholder="Provide reason for Credit Note return" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- D. Measure fields -->
+                            <div class="form-section">
+                                <h3 class="section-title">D. Measure Fields (Optional)</h3>
+                                <div class="grid-3">
+                                    <div class="form-group">
+                                        <label for="cn-return-sales">Return Sales</label>
+                                        <input type="number" id="cn-return-sales" class="form-input" placeholder="0.00" step="0.01">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="cn-return-tax">Return Tax</label>
+                                        <input type="number" id="cn-return-tax" class="form-input" placeholder="0.00" step="0.01">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="cn-return-cogs">Return COGS</label>
+                                        <input type="number" id="cn-return-cogs" class="form-input" placeholder="0.00" step="0.01">
+                                    </div>
+                                </div>
+                                <div class="grid-3 mt-3">
+                                    <div class="form-group">
+                                        <label for="cn-msn">MSN</label>
+                                        <input type="text" id="cn-msn" class="form-input" placeholder="MSN code">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="cn-supplier-id">Supplier ID</label>
+                                        <input type="text" id="cn-supplier-id" class="form-input" placeholder="SUP-000">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="cn-supplier-name">Supplier Name</label>
+                                        <input type="text" id="cn-supplier-name" class="form-input" placeholder="Name">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="reset" class="btn-secondary">Reset Form</button>
+                                <button type="submit" class="btn-primary cn-btn">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                                    Save Credit Note
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- 4. CREATE MANUAL DEBIT NOTE (DN) VIEW -->
+                <section id="tab-create-dn" class="tab-pane">
+                    <div class="content-card form-card">
+                        <div class="card-header border-bottom">
+                            <h2>Create Manual Debit Note (DN)</h2>
+                            <span class="required-notice">* Indicates mandatory field</span>
+                        </div>
+                        <form id="form-dn" class="document-form">
+                            <!-- A. Identity fields -->
+                            <div class="form-section">
+                                <h3 class="section-title">A. Identity Fields</h3>
+                                <div class="grid-3">
+                                    <div class="form-group required">
+                                        <label for="dn-sale-type">Sale Type</label>
+                                        <select id="dn-sale-type" class="form-input" required>
+                                            <option value="Manual DN Price" selected>Manual DN Price</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- B. Grain fields -->
+                            <div class="form-section">
+                                <h3 class="section-title">B. Grain Fields</h3>
+                                <div class="grid-2">
+                                    <div class="form-group required">
+                                        <label for="dn-invoice-number">Original Invoice Number</label>
+                                        <input type="text" id="dn-invoice-number" class="form-input" placeholder="INV-2026-000" required>
+                                    </div>
+                                    <div class="form-group required">
+                                        <label for="dn-invoice-date">Invoice Date</label>
+                                        <input type="date" id="dn-invoice-date" class="form-input" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- C. Attribute fields -->
+                            <div class="form-section">
+                                <h3 class="section-title">C. Attribute Fields</h3>
+                                <div class="grid-3">
+                                    <div class="form-group required">
+                                        <label for="dn-id-company">ID Company</label>
+                                        <input type="text" id="dn-id-company" class="form-input" placeholder="MOGLIX-IND" required>
+                                    </div>
+                                    <div class="form-group required">
+                                        <label for="dn-plant-id">Plant ID</label>
+                                        <input type="text" id="dn-plant-id" class="form-input" placeholder="PL001" required>
+                                    </div>
+                                    <div class="form-group required">
+                                        <label for="dn-plant-name">Plant Name</label>
+                                        <input type="text" id="dn-plant-name" class="form-input" placeholder="Delhi Warehouse" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- D. Measure fields -->
+                            <div class="form-section">
+                                <h3 class="section-title">D. Measure Fields</h3>
+                                <div class="grid-4">
+                                    <div class="form-group required">
+                                        <label for="dn-value-sp">Value SP</label>
+                                        <input type="number" id="dn-value-sp" class="form-input math-trigger" placeholder="0.00" step="0.01" required>
+                                    </div>
+                                    <div class="form-group required">
+                                        <label for="dn-sales-wo-tax">Sales Without Tax</label>
+                                        <input type="number" id="dn-sales-wo-tax" class="form-input math-trigger" placeholder="0.00" step="0.01" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="dn-qty">Quantity</label>
+                                        <input type="number" id="dn-qty" class="form-input" placeholder="0" step="1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="dn-tax">Tax Amount</label>
+                                        <div class="input-with-action">
+                                            <input type="number" id="dn-tax" class="form-input" placeholder="0.00" step="0.01">
+                                            <button type="button" class="btn-mini-calc" id="btn-calc-tax-dn" title="Auto calculate 18% GST">18%</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="grid-4 mt-3">
+                                    <div class="form-group">
+                                        <label for="dn-sales-with-tax">Sales With Tax</label>
+                                        <input type="number" id="dn-sales-with-tax" class="form-input" placeholder="0.00" step="0.01">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="dn-gmv">GMV</label>
+                                        <input type="number" id="dn-gmv" class="form-input" placeholder="0.00" step="0.01">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="dn-cogs">COGS</label>
+                                        <input type="number" id="dn-cogs" class="form-input" placeholder="0.00" step="0.01">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="dn-eff-cogs">Effective COGS</label>
+                                        <input type="number" id="dn-eff-cogs" class="form-input" placeholder="0.00" step="0.01">
+                                    </div>
+                                </div>
+                                <div class="grid-3 mt-3">
+                                    <div class="form-group">
+                                        <label for="dn-msn">MSN</label>
+                                        <input type="text" id="dn-msn" class="form-input" placeholder="MSN code">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="dn-supplier-id">Supplier ID</label>
+                                        <input type="text" id="dn-supplier-id" class="form-input" placeholder="SUP-000">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="dn-supplier-name">Supplier Name</label>
+                                        <input type="text" id="dn-supplier-name" class="form-input" placeholder="Name">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="reset" class="btn-secondary">Reset Form</button>
+                                <button type="submit" class="btn-primary dn-btn">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                                    Save Debit Note
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Details View Modal -->
+    <div id="details-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-doc-title">Document Details</h2>
+                <button class="close-modal-btn" id="btn-close-modal">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-details-body">
+                <!-- Dynamically populated details list -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="btn-modal-close">Close</button>
+                <button class="btn-primary" id="btn-modal-download">Download PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
